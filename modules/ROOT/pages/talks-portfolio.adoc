@@ -1,0 +1,222 @@
+= Conference talks portfolio
+:fitrect: 50x400mm
+:cols: cols="220, 100"
+:grid: frame=none, grid=none
+
+This is a list of my conference talks for the last 5 years, grouped by years and topics. Most of the talks were given repeatedly at several events, the performances that were most successful in my opinion are highlighted **in bold**. The estimates of the number of participants are taken from conference web sites.
+
+== 2017
+
+=== Hidden complexity of a routine task: presenting table data in user interface
+
+[{cols}, frame=none, grid=none]
+|===
+a|* Description and video of JPoint2017 version: https://jugspeakers.info/information/talks/talk/446[jugspeakers.info/information/talks/talk/446]
+
+* Blog post in English: https://dzone.com/articles/hidden-complexity-of-a-routine-task-presenting-tab[dzone.com/articles/hidden-complexity-of-a-routine-task-presenting-tab]
+* Blog post in Russian, extended version: 
+** Part 1: https://habr.com/post/278773/[habr.com/post/278773]
+** Part 2: https://habr.com/post/279083/[habr.com/post/279083]   
+
+
+.Presented at:
+
+* **08.04.2017 JPoint 2017, Moscow** (major international Java conference, **over 1000 participants**) https://2017.jpoint.ru/en/[2017.jpoint.ru/en/]
+* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/information/events/event/122[jugspeakers.info/information/events/event/122]
+a|image::jpoint2017.jpg[fitrect="{fitrect}"]
+|===
+
+
+=== Celesta: creation of business logic in Java ecosystem
+
+[{cols}, frame=none, grid=none]
+|===
+a|
+* Description and video: https://jugspeakers.info/information/talks/talk/1950[jugspeakers.info/information/talks/talk/1950]
+* Blog post in English: https://dzone.com/articles/celesta-sql-databases-api-schema-migration-and-tes[dzone.com/articles/celesta-sql-databases-api-schema-migration-and-tes]
+* Blog post in Russian (updated version): https://habr.com/post/455746/[habr.com/post/455746]
+
+.Presented at:
+
+* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/information/events/event/122[jugspeakers.info/information/events/event/122]
+* **16.03.2018 SECON 2018, Penza (1400 attendees)**: https://2018.secon.ru/reports/celesta-sozdanie-biznes-logiki-v-java-ekosisteme[2018.secon.ru/reports/celesta-sozdanie-biznes-logiki-v-java-ekosisteme]
+a|image::jug2017.jpg[fitrect="{fitrect}"]
+image::secon2018.jpg[fitrect="{fitrect}"]
+|===
+
+== 2018
+
+=== Ansible Playbooks Are Code
+
+[{cols}, frame=none, grid=none]
+|===
+a|
+* Description and video of the DevOops 2018 version: https://jugspeakers.info/information/talks/talk/997[jugspeakers.info/information/talks/talk/997]
+
+* Transcript of the DevOops version (in Russian): https://habr.com/post/488966/[habr.com/post/488966]
+
+.Presented at:
+
+* 12.10.2018 Devops Moscow local meetup, Moscow https://youtu.be/xZHrzTz9T1I[youtu.be/xZHrzTz9T1I]
+* **14.10.2018 DevOops 2018, St. Petersburg** conference on Devops, **more than 500 visitors** in 2018: https://2018.devoops-piter.ru/en/[2018.devoops-piter.ru/en]
+* 22.11.2018 RedCode local meetup, Krasnodar https://www.meetup.com/ru-RU/redcode/[meetup.com/ru-RU/redcode]
+a|
+image:devoops2018.jpg[fitrect="{fitrect}"]
+image:devopsmsk2018.jpg[fitrect="{fitrect}"]
+
+|===
+
+== 2019
+
+=== Kafka Streams API: Moving beyond Hello World
+
+[{cols},{grid}]
+|===
+a|
+
+* Description and video of JPoint 2019 version: https://jugspeakers.info/information/talks/talk/66[jugspeakers.info/information/talks/talk/66]
+* Slides, part 1: https://inponomarev.github.io/kstreams-examples/lecture01/index-en.html[inponomarev.github.io/kstreams-examples/lecture01/index-en.html], 
+* Slides, part 2: https://inponomarev.github.io/kstreams-examples/lecture02/index-en.html[inponomarev.github.io/kstreams-examples/lecture02/index-en.html]
+
+
+.Presented at:
+
+* **06.04.2019 JPoint 2019, Moscow (more than 1000 participants)** https://2019.jpoint.ru/en/[2019.jpoint.ru/en] 
+* 16.02.2019 PermDevDay 2019, Perm https://permdevday.timepad.ru/event/891016/[permdevday.timepad.ru/event/891016]
+* 25.07.2019 JugMSK #40 local meetup, Moscow https://jugspeakers.info/information/events/event/189[jugspeakers.info/information/events/event/189]
+* 12.10.2019 Stachka Innopolis 2019, Kazan http://web.archive.org/web/20200819012445/https://nastachku.ru/archive/2019_innopolis/index.php[web.archive.org/web/20200819012445/https://nastachku.ru/archive/2019_innopolis/index.php]
+
+a|
+image::permdevday.jpg[fitrect="{fitrect}"]
+image::jpoint2019.jpg[fitrect="{fitrect}"]
+|===
+
+=== Continuous Static Code Analisys
+
+[{cols},{grid}]
+|===
+a|
+* Description and video of Heisenbug 2019 version: https://jugspeakers.info/information/talks/talk/1235[jugspeakers.info/information/talks/talk/1235]
+* Blog post in English: https://habr.com/post/440610/[habr.com/post/440610] 
+* Blog post in Russian: https://habr.com/post/436868/[habr.com/post/436868]
+
+.Presented at:
+
+* 20.04.2019 Devops Forum 2019, Moscow https://devopsforum.ru/devops2019[devopsforum.ru/devops2019]
+* **17.05.2019 Heisenbug 2019, St. Petersburg (over 1000 participants)** https://2019.heisenbug-piter.ru/en/[2019.heisenbug-piter.ru/en]
+* 26.04.2019 Stachka 2019 Spring, Ulyanovsk http://web.archive.org/web/20200513164152/https://nastachku.ru/archive/2019/index.php[web.archive.org/web/20200513164152/https://nastachku.ru/archive/2019/index.php]
+a|
+image::heisenbug2019.jpg[fitrect="{fitrect}"]
+image::devopsforum2019.jpg[fitrect="{fitrect}"]
+|===
+
+== 2020
+
+=== Apache Kafka: What is it and how will it change the architecture of your application
+
+[{cols},{grid}]
+|===
+
+a|
+* Description and video of the HolyJS 2020 talk: https://jugspeakers.info/information/talks/talk/1420[jugspeakers.info/information/talks/talk/1420]
+
+* Slides in English: https://inponomarev.github.io/kafka-hjs/index-en.html[inponomarev.github.io/kafka-hjs/index-en.html]
+
+.Presented at:
+
+* 25.06.2020, HolyJS 2020 SPb, online (conference for JavaScript developers) https://2020.holyjs-piter.ru/en/[2020.holyjs-piter.ru/en]
+a|
+image::holyjs2020.jpg[fitrect="{fitrect}"]
+|===
+
+
+=== Kafka streams testing: A deep dive
+
+[{cols},{grid}]
+|===
+a|
+In collaboration with John Roesler (https://www.linkedin.com/in/john-roesler-6280755/[linkedin.com/in/john-roesler-6280755]).
+
+* Description and video of the Joker 2020 talk: https://jugspeakers.info/information/talks/talk/2714[jugspeakers.info/information/talks/talk/2714]
+
+* Slides in English: https://inponomarev.github.io/kstreams-testing-pitfalls/[inponomarev.github.io/kstreams-testing-pitfalls]
+
+* Confluent blogpost in English, updated and co-authored by John Roesler: https://www.confluent.io/blog/testing-kafka-streams/[confluent.io/blog/testing-kafka-streams]
+
+* Original blogpost in Russian, somewhat outdated: https://habr.com/post/499408/[habr.com/post/499408]
+
+
+.Presented at:
+
+* 28.11.2020 Joker 2020, online: https://2020.jokerconf.com/en/[2020.jokerconf.com/en]
+a|
+image:joker2020.jpg[fitrect="{fitrect}"]
+
+|===
+
+== 2021
+
+=== LJV: What We Can Learn from Visualizing Data Structures in Java
+
+[{cols},{grid}]
+|===
+
+a|
+* Description and video of the SnowOne 2021 version: https://jugspeakers.info/information/talks/talk/2895[jugspeakers.info/information/talks/talk/2895]
+
+* Blog post in English: https://dzone.com/articles/what-can-we-learn-from-java-data-structures-visual[dzone.com/articles/what-can-we-learn-from-java-data-structures-visual]
+
+* Blog post in Russian (extended version) https://habr.com/post/599045/[habr.com/post/599045].
+
+* Slides in Russian: https://inponomarev.github.io/ljvtalk/[inponomarev.github.io/ljvtalk]
+
+.Presented at:
+
+* **26.02.2021 SnowOne 2021, online.** Java conference from Novisibirsk https://snowone.ru/en
+
+* 26.08.2021 DevClub local meetup, Tallinn https://devclub.eu, https://youtu.be/Nu01peDzntg.
+
+a|
+image::snowone2021.jpg[fitrect="{fitrect}"]
+image::tallinn2021.jpg[fitrect="{fitrect}"]
+|===
+
+== 2022
+
+=== Mocks vs Testcontainers
+
+[{cols},{grid}]
+|===
+a|
+* Description and video of Heisenbug 2022 version: https://jugspeakers.info/information/talks/talk/3711[jugspeakers.info/information/talks/talk/3711]
+
+* Slides in Russian: https://inponomarev.github.io/mocks-talk[inponomarev.github.io/mocks-talk]
+
+.Presented at:
+
+* 31.03.2022 DevClub local meetup, Tallinn https://devclub.eu[devclub.eu], https://youtu.be/QGQPPOj-fV0[youtu.be/QGQPPOj-fV0]
+* **30.05.2022 Heisenbug Spring 2022, online** https://2022spring.heisenbug.ru/en/[2022spring.heisenbug.ru/en]
+* 24.06.2022 JPoint 2022, St. Petersburg https://jpoint.ru/en/[jpoint.ru/en]
+a|
+image::tallinn2022.jpg[fitrect="{fitrect}"]
+image::jpoint2022.jpg[fitrect="{fitrect}"]
+|===
+
+
+=== Type Variance in Java and Kotlin
+
+[{cols},{grid}]
+|===
+a|
+* Description of Joker 2022 version, no publicly available video yet: https://jugspeakers.info/information/talks/talk/4235[jugspeakers.info/information/talks/talk/4235]
+* Slides in English: https://inponomarev.github.io/variance-lecture/[inponomarev.github.io/variance-lecture]
+
+.Presented at:
+
+* **08.11.2022 Joker 2022, online (in Russian) https://jokerconf.com/en/talks/ea5a6489c12f42f5a542fc212285902e/[jokerconf.com]**
+
+* As a lecture at Mainor university (in English): https://youtu.be/BMbZm_r52Ho[youtu.be/BMbZm_r52Ho]
+
+a|
+image::joker2022.jpg[fitrect="{fitrect}"]
+|===

@@ -1,0 +1,129 @@
+= Core Java: Lecture course
+
+These are my working materials for lectures and labs conducted at MIPT (Moscow) and Mainor (Tallinn). Slide decks contain more than 800 slides being maintained in two language versions and constantly updated.
+
+https://github.com/inponomarev/java-mipt[icon:github[] Source code] of slides and code examples
+
+[cols="^10,200,^50,^50,^50,^50"]
+|===
+
+.2+<|Week no.
+
+.2+|Topic
+
+2+| icon:flag-ru[] In Russian
+
+2+| icon:flag-uk[] In English
+|Video +
+2020
+|Slides
+|Video +
+2022
+|Slides
+
+|1
+|Overview of the history, features, and facilities of Java ecosystem
+|https://www.youtube.com/watch?v=q-d40ZWGcJQ[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides01/[icon:chalkboard[]]
+|
+|https://inponomarev.github.io/java-mipt/slides01/index-en.html[icon:chalkboard[]]
+
+
+|2
+|Primitive types. Execution control. Operators. Arrays
+|https://www.youtube.com/watch?v=WFVJEzxSzzA[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides02/[icon:chalkboard[]]
+|
+| https://inponomarev.github.io/java-mipt/slides02/index-en.html[icon:chalkboard[]]
+
+|3
+| Classes. Interfaces. Object class and its standard methods
+| https://www.youtube.com/watch?v=UKV2gwgajDk[icon:youtube[]]
+| https://inponomarev.github.io/java-mipt/slides03/[icon:chalkboard[]]
+|
+| https://inponomarev.github.io/java-mipt/slides03/index-en.html[icon:chalkboard[]]
+
+|4
+|Enumerations. Exceptions. Strings
+|https://www.youtube.com/watch?v=VTFuqbVg5qc[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides04/[icon:chalkboard[]]
+|https://youtu.be/Ie40-C7ZfiM[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides04/index-en.html[icon:chalkboard[]]
+
+|5
+|Regular expressions. Wrapper classes. IO classes. DateTime API
+|https://www.youtube.com/watch?v=GQLzO5lNEvE[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides05/[icon:chalkboard[]]
+|
+|https://inponomarev.github.io/java-mipt/slides05/index-en.html[icon:chalkboard[]]
+
+|6
+|Generics
+|https://www.youtube.com/watch?v=HFs_ZPNkdjo[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides06/[icon:chalkboard[]]
+|_Generics:_ +
+https://www.youtube.com/watch?v=G9_7S34a3ms[icon:youtube[]] +
+_Java and Kotlin
+type variance:_ +
+https://www.youtube.com/watch?v=BMbZm_r52Ho[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides06/index-en.html[icon:chalkboard[]]
+
+|7
+|Collections, lambdas, method references
+|https://www.youtube.com/watch?v=QstdVe6cSbo[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides07/[icon:chalkboard[]]
+|_Collections API:_ +
+https://youtu.be/4TQwaWvDrTA[icon:youtube[]] +
+_Lambdas and method references:_ +
+https://youtu.be/aURwUr7dij8[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides07/index-en.html[icon:chalkboard[]]
+
+|8
+|JDBC API
+|https://www.youtube.com/watch?v=UZJZwkgp__4[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides08/[icon:chalkboard[]]
+|
+|https://inponomarev.github.io/java-mipt/slides08/index-en.html[icon:chalkboard[]]
+
+|9
+|Streams API, Optionals.
+|https://www.youtube.com/watch?v=NMQ_z8Wlrbw[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides09/[icon:chalkboard[]]
+|https://youtu.be/PRuLWeM_6wU[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides09/index-en.html[icon:chalkboard[]]
+
+|10
+|Java Concurrency (part 1)
+|https://www.youtube.com/watch?v=VAOqoiLY8og[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides10/[icon:chalkboard[]]
+|https://www.youtube.com/watch?v=eYSB3faBSrI[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides10/index-en.html[icon:chalkboard[]]
+
+|11
+|Java Concurrency (part 2). Annotations.
+|https://www.youtube.com/watch?v=ZrF8wwN6zFo[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides11/[icon:chalkboard[]]
+|https://www.youtube.com/watch?v=yOTfCDdzdyU[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides11/index-en.html[icon:chalkboard[]]
+
+|12
+|Annotations (ending). Reflection API. Application architecture. Singleton (anti)pattern.
+|https://www.youtube.com/watch?v=i4zicUzCq0w[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides12/[icon:chalkboard[]]
+|
+|https://inponomarev.github.io/java-mipt/slides12/index-en.html[icon:chalkboard[]]
+
+|13
+|Dependency Injection. DI working principles. Spring Framework: Spring DI, Spring AOP
+|https://www.youtube.com/watch?v=szI5sza6Wug[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides13/[icon:chalkboard[]]
+|
+|https://inponomarev.github.io/java-mipt/slides13/index-en.html[icon:chalkboard[]]
+
+|14
+|Spring AOP (ending). Spring Boot
+|https://www.youtube.com/watch?v=ftl7iebCLqQ"[icon:youtube[]]
+|https://inponomarev.github.io/java-mipt/slides14/[icon:chalkboard[]]
+|
+|https://inponomarev.github.io/java-mipt/slides14/index-en.html[icon:chalkboard[]]
+|===
