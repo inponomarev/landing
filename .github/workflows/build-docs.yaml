@@ -16,8 +16,14 @@ jobs:
         with:
           node-version: 16
           cache: 'npm'
+      
       - run: npm i
+      
       - run: npx antora --fetch antora-playbook.yml
+      
+      - run: echo ponomarev.uk > build/site/CNAME
+      
+      - run: touch build/site/.nojekyll
 
       - name: Deploy to GitHub Pages
         if: success() && github.ref == 'refs/heads/master'
