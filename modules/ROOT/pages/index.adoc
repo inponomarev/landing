@@ -11,9 +11,9 @@ I{nbsp}strive to instill love and deep understanding of the craft of software de
 
 My competencies include Java, Kotlin, software testing and QA.
 
-When talking about JVM languages, I prefer to dive deep in advanced topics, including https://www.youtube.com/watch?v=BMbZm_r52Ho[icon:youtube[]{nbsp}generics], functional style programming, concurrency (https://www.youtube.com/watch?v=eYSB3faBSrI[icon:youtube[]{nbsp}lecture{nbsp}1], https://www.youtube.com/watch?v=yOTfCDdzdyU[icon:youtube[]{nbsp}lecture{nbsp}2]), annotations processing etc.
+When talking about JVM languages, I prefer to dive deep in advanced topics, including https://www.youtube.com/watch?v=BMbZm_r52Ho[icon:youtube[]{nbsp}generics], functional style programming, concurrency (https://www.youtube.com/watch?v=eYSB3faBSrI[icon:youtube[]{nbsp}lecture{nbsp}1], https://www.youtube.com/watch?v=yOTfCDdzdyU[icon:youtube[]{nbsp}lecture{nbsp}2]), annotations processing etc. I also practice OSS contribution with students. Projects being maintained under my supervision include https://github.com/atp-mipt/ljv[ljv] and https://github.com/fppt/jedis-mock[jedis-mock].
 
-NOTE: See my xref:javacourse.adoc[Core Java course working materials]
+NOTE: xref:javacourse.adoc[Core Java course working materials]
 
 == Experience in software engineering industry
 
@@ -60,7 +60,7 @@ Program Committe member at the following conferences:
 [none]
 * A conference on systems and business analysis.
 
-NOTE: See my xref:talks-portfolio.adoc[conference talks portfolio]
+NOTE: xref:talks-portfolio.adoc[Conference talks portfolio]
 
 
 == Education
