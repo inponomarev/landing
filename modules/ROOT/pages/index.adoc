@@ -23,18 +23,18 @@ See my https://www.linkedin.com/in/inponomarev/[linkedin profile] for my CV in S
 
 == Experience in education
 
-**February 2022 — present**
+**https://www.euas.eu[Estonian Enterpreneurship University of Applied Sciences]** (February 2022 — present)
 
 [none]
-* **https://www.euas.eu[Estonian Enterpreneurship University of Applied Sciences]**. Lecturer.
+* Lecturer.
 
 ** Lectures and labs on "Object oriented programming"
 ** Lectures on Java Concurrency
 
-**October 2003 — December 2022**
+**https://mipt.ru/english[Moscow Institute of Physics and Technology]** (October 2003 — December 2022)
 
 [none]
-* **https://mipt.ru/english[Moscow Institute of Physics and Technology]**  Associate Professor, lecturer, tutor.
+* Associate Professor, lecturer, tutor.
 
 ** "Elements of axiomatic set theory" (2015-2019)
 ** "Java Core"
@@ -43,20 +43,20 @@ See my https://www.linkedin.com/in/inponomarev/[linkedin profile] for my CV in S
 
 == Tech conferences & tech community
 
-**Autumn 2020 — present**
+**Program Committe member at https://heisenbug.ru/en/[Heisenbug]** (Autumn 2020 — present)
 
 [none]
-* Program Committe member at https://heisenbug.ru/en/[Heisenbug], a conference about engineering approaches to quality assurance in software.
+* A conference about engineering approaches to quality assurance in software.
 
-**Autumn 2021 — present**
-
-[none]
-* Program Committe member at https://hydraconf.com/[Hydra], a conference on concurrent and distributed computing.
-
-**2022**
+**Program Committe member at https://hydraconf.com/[Hydra]** (Autumn 2021 — present)
 
 [none]
-* Program Committe member at https://flowconf.ru/en/[Flow], a conference on systems and business analysis.
+* A conference on concurrent and distributed computing.
+
+**Program Committe member at https://flowconf.ru/en/[Flow]** (2022)
+
+[none]
+* A conference on systems and business analysis.
 
 NOTE: See my xref:talks-portfolio.adoc[conference talks portfolio]
 
