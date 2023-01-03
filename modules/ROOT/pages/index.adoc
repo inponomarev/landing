@@ -5,13 +5,13 @@
 image::ivan.jpg[width="200" role="related thumb left"]
 
 Software engineering and teaching are the two biggest passions in my life.
-I teach students what I do on a daily basis, what the industry will require of them and what I lacked when I studied at the university.
+I{nbsp}teach students what I do on a daily basis, what the industry will require of them and what I{nbsp}lacked when I{nbsp}studied at the university.
 
-I strive to instill love and deep understanding of the craft of software development, with all its trade-offs and imperfections, utilizing up-to-date tools and techniques.
+I{nbsp}strive to instill love and deep understanding of the craft of software development, with all its trade-offs and imperfections, utilizing up-to-date tools and techniques.
 
 My competencies include Java, Kotlin, software testing and QA.
 
-When talking about JVM languages, I prefer to dive deep in advanced topics, including https://www.youtube.com/watch?v=BMbZm_r52Ho[generics], functional style programming, concurrency (https://www.youtube.com/watch?v=eYSB3faBSrI[1], https://www.youtube.com/watch?v=yOTfCDdzdyU[2]), annotations processing etc.
+When talking about JVM languages, I prefer to dive deep in advanced topics, including https://www.youtube.com/watch?v=BMbZm_r52Ho[icon:youtube[]{nbsp}generics], functional style programming, concurrency (https://www.youtube.com/watch?v=eYSB3faBSrI[icon:youtube[]{nbsp}lecture{nbsp}1], https://www.youtube.com/watch?v=yOTfCDdzdyU[icon:youtube[]{nbsp}lecture{nbsp}2]), annotations processing etc.
 
 NOTE: See my xref:javacourse.adoc[Core Java course working materials]
 
@@ -43,17 +43,19 @@ See my https://www.linkedin.com/in/inponomarev/[linkedin profile] for my CV in S
 
 == Tech conferences & tech community
 
-**Program Committe member at https://heisenbug.ru/en/[Heisenbug]** (Autumn 2020 — present)
+Program Committe member at the following conferences:
+
+**https://heisenbug.ru/en/[Heisenbug]** (Autumn 2020 — present)
 
 [none]
 * A conference about engineering approaches to quality assurance in software.
 
-**Program Committe member at https://hydraconf.com/[Hydra]** (Autumn 2021 — present)
+**https://hydraconf.com/[Hydra]** (Autumn 2021 — present)
 
 [none]
 * A conference on concurrent and distributed computing.
 
-**Program Committe member at https://flowconf.ru/en/[Flow]** (2022)
+**https://flowconf.ru/en/[Flow]** (2022)
 
 [none]
 * A conference on systems and business analysis.
