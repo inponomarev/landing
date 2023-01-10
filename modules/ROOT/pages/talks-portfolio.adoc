@@ -209,6 +209,7 @@ image::jpoint2022.jpg[fitrect="{fitrect}"]
 |===
 a|
 * Description of Joker 2022 version, no publicly available video yet: https://jugspeakers.info/information/talks/talk/4235[jugspeakers.info/information/talks/talk/4235]
+* Blog post in English: https://dzone.com/articles/type-variance-in-java-and-kotlin[dzone.com/articles/type-variance-in-java-and-kotlin]
 * Slides in English: https://inponomarev.github.io/variance-lecture/[inponomarev.github.io/variance-lecture]
 
 .Presented at:
