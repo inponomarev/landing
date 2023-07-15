@@ -1,19 +1,20 @@
 = Ivan Ponomarev, Ph.D.
 
-[cols="30a,70a",frame=none,grid=none]
+[cols="50a,50a",frame=none,grid=none]
 |===
-a|
 a|
 :icons: font
 [none]
-* Birth year: 1980
-* image:map-marker.svg[] Tallinn, Estonia 
-* image:house.svg[] https://inponomarev.ru/[inponomarev.ru]
-* image:envelope.svg[] ivan@galahad.ee
-* image:phone.svg[] +37258027980
-* image:linkedin.svg[] https://www.linkedin.com/in/inponomarev/[inponomarev]
-* image:twitter.svg[] https://twitter.com/inponomarev[@inponomarev]
-* image:github.svg[] https://github.com/inponomarev[inponomarev]
+* image:map-marker.svg[width=32] London, UK 
+* image:envelope.svg[width=32] ivan@galahad.ee
+* image:phone.svg[width=32] +37258027980
+
+a|
+:icons: font
+[none]
+* image:linkedin.svg[width=32] https://www.linkedin.com/in/inponomarev/[inponomarev]
+* image:twitter.svg[width=32] https://twitter.com/inponomarev[@inponomarev]
+* image:github.svg[width=32] https://github.com/inponomarev[inponomarev]
 |===
 
 == Key skills
