@@ -1,0 +1,115 @@
+= Ivan Ponomarev, Ph.D.
+
+[cols="30a,70a",frame=none,grid=none]
+|===
+a|
+a|
+:icons: font
+[none]
+* Birth year: 1980
+* image:map-marker.svg[] Tallinn, Estonia 
+* image:house.svg[] https://inponomarev.ru/[inponomarev.ru]
+* image:envelope.svg[] ivan@galahad.ee
+* image:phone.svg[] +37258027980
+* image:linkedin.svg[] https://www.linkedin.com/in/inponomarev/[inponomarev]
+* image:twitter.svg[] https://twitter.com/inponomarev[@inponomarev]
+* image:github.svg[] https://github.com/inponomarev[inponomarev]
+|===
+
+== Key skills
+
+* Software engineering, mostly with JVM-based backend.
+* QA in software development.
+* Teaching, training, conference speaking
+
+== Experience
+
+**October 2021 — present**
+
+[none]
+* **Synthesized** (https://www.synthesized.io/[synthesized.io]) Staff software engineer.  Ensuring best engineering practices in the field of QA and delivery. Proposing and implementing effictive algorithmic solutions.
+
+**June 2016 — October 2021**
+
+[none]
+* Sole proprietorship. IT consultant and tutor. Technical management of the development and deployment of services related to betting/gambling for an online betting/gambling provider based in Cyprus. Technologies involved:  
+**	Backend: Java (Spring Boot microservices), Kafka Streams, PostgreSQL, Redis 
+**	CI/CD: GitHub, Jenkins, Artifactory, Kubernetes, Helm, Terraform.
+
+**June 2008 — June 2016**  
+
+[none]
+* **KURS-IT LLC**. (http://curs.ru/[curs.ru]) Project Manager, Tech Lead +
+Java-related software development projects management.
+
+** Development and deployment of informational systems in banking and education. Technologies involved: Java, Tomcat, GWT, MSSQL/DB2/PostrgreSQL. 
+
+** Architecture and implementation of open-source framework Celesta (https://courseorchestra.github.io/celesta/en/[courseorchestra.github.io/celesta/en]).
+
+**June 2010 — July 2016**
+
+[none]
+* **Lancelot LLC.** (https://lancelot-it.ru/[lancelot-it.ru]) CTO. Co-founder. +
+Managing full cycle of development, deployment and support of ERP system (Microsoft Dynamics) for Moscow headquarters of one of leading electronics manufacturers.
+
+
+**June 2003 — June 2010**
+
+[none]
+* **LANIT Consulting** (https://lanit.ru/en/[lanit.ru/en]). Microsoft Dynamics ERP  Developer, Senior Developer. Participation in development and deployment of ERP systems.
+
+
+**October 2000 —  June 2003**
+
+[none]
+* **OOO KURS** Delphi developer. Senior Delphi developer. Participation in development of analytical software.
+
+== Work in education
+
+**February 2022 — present**
+
+[none]
+* **Estonian Enterpreneurship University of Applied Sciences** (https://www.euas.eu[euas.eu]). Lecturer.
+
+**October 2003 — spring 2022**
+
+[none]
+* **Moscow Institute of Physics and Technology** (https://mipt.ru/english/[mipt.ru/english]) Associate Professor, lecturer, tutor.
+
+
+== Tech conferences
+
+**Program Committee member** of the following conferences:
+
+**autumn 2020 — present**
+
+[none]
+* **Heisenbug** https://heisenbug.ru/en/[heisenbug.ru/en] -- engineering approaches to quality assurance in software.
+
+**autumn 2021 — present**
+
+[none]
+* **Hydra** https://hydraconf.com/[hydraconf.com] -- concurrent and distributed computing.
+
+**spring 2022 — present**
+
+[none]
+* **Flow** https://flowconf.ru/en/[flowconf.ru/en]  -- systems and business analysis. 
+
+
+Follow this link to see an incomplete list of my talks at conferences and meetups: 
+https://jugspeakers.info/information/speakers/speaker/19[jugspeakers.info/information/speakers/speaker/19]
+
+
+== Blog posts
+
+Follow these links to see lists of blog posts on the respective platforms:
+
+** **Habr** https://habr.com/ru/users/ivanponomarev/posts/[habr.com/ru/users/ivanponomarev/posts/]
+** **DZone** https://dzone.com/users/3168637/iponomarev.html[dzone.com/users/3168637/iponomarev.html] 
+** **Confluent**  https://www.confluent.io/blog/author/ivan-ponomarev/[confluent.io/blog/author/ivan-ponomarev]
+
+
+== Education 
+* **1997-2003** Moscow Institute of Physics and Technology, BSc, MSc 
+* **2003-2006** Moscow Institute of Physics and Technology, Ph.D. in Mathematical Modeling & Numerical Methods

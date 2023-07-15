@@ -1,5 +1,7 @@
 :icons: font
 
+xref:cv.adoc[CV]
+
 == University lecturer & tutor in Software Engineering with solid practical background
 
 image::ivan.jpg[width="200" role="related thumb left"]
