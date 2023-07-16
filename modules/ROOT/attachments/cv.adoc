@@ -1,29 +1,35 @@
 = Ivan Ponomarev, Ph.D.
 
-[cols="50a,50a",frame=none,grid=none]
+== Curriculum Vitae
+
+[cols="33a,33a,33a",frame=none,grid=none]
 |===
 a|
 :icons: font
 [none]
-* image:map-marker.svg[width=32] London, UK 
-* image:envelope.svg[width=32] ivan@galahad.ee
-* image:phone.svg[width=32] +37258027980
+* image:map-marker.svg[] London, UK 
+* image:envelope.svg[] ivan@galahad.ee
 
 a|
 :icons: font
 [none]
-* image:linkedin.svg[width=32] https://www.linkedin.com/in/inponomarev/[inponomarev]
-* image:twitter.svg[width=32] https://twitter.com/inponomarev[@inponomarev]
-* image:github.svg[width=32] https://github.com/inponomarev[inponomarev]
+* image:phone.svg[] +447770090885
+* image:linkedin.svg[] https://www.linkedin.com/in/inponomarev/[inponomarev]
+
+a|
+:icons: font
+[none]
+* image:twitter.svg[] https://twitter.com/inponomarev[@inponomarev]
+* image:github.svg[] https://github.com/inponomarev[inponomarev]
 |===
 
-== Key skills
+=== Key skills
 
 * Software engineering, mostly with JVM-based backend.
 * QA in software development.
 * Teaching, training, conference speaking
 
-== Experience
+=== Experience
 
 **October 2021 — present**
 
@@ -65,7 +71,7 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 [none]
 * **OOO KURS** Delphi developer. Senior Delphi developer. Participation in development of analytical software.
 
-== Work in education
+=== Work in education
 
 **February 2022 — present**
 
@@ -78,7 +84,7 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 * **Moscow Institute of Physics and Technology** (https://mipt.ru/english/[mipt.ru/english]) Associate Professor, lecturer, tutor.
 
 
-== Tech conferences
+=== Tech conferences
 
 **Program Committee member** of the following conferences:
 
@@ -99,10 +105,10 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 
 
 Follow this link to see an incomplete list of my talks at conferences and meetups: 
-https://jugspeakers.info/information/speakers/speaker/19[jugspeakers.info/information/speakers/speaker/19]
+https://ponomarev.uk/talks-portfolio.html[ponomarev.uk/talks-portfolio.html]
 
 
-== Blog posts
+=== Blog posts
 
 Follow these links to see lists of blog posts on the respective platforms:
 
@@ -111,6 +117,6 @@ Follow these links to see lists of blog posts on the respective platforms:
 ** **Confluent**  https://www.confluent.io/blog/author/ivan-ponomarev/[confluent.io/blog/author/ivan-ponomarev]
 
 
-== Education 
+=== Education 
 * **1997-2003** Moscow Institute of Physics and Technology, BSc, MSc 
 * **2003-2006** Moscow Institute of Physics and Technology, Ph.D. in Mathematical Modeling & Numerical Methods
