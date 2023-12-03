@@ -221,3 +221,38 @@ a|
 a|
 image::joker2022.jpg[fitrect="{fitrect}"]
 |===
+
+== 2023
+
+=== Don't Invent Data for Integration Tests - Synthesize It
+
+[{cols},{grid}]
+|===
+a|
+
+* Slides in English: https://inponomarev.github.io/tdktc-talk[inponomarev.github.io/tdktc-talk]
+
+.Presented at:
+
+* 31.03.2023 Java User Group Cyprus, Nikosia (in English) https://youtu.be/ONSwnQWeZMw[youtu.be/ONSwnQWeZMw]
+* **31.05.2023 DevClub local meetup, Tallinn (in Russian) https://youtu.be/iXIgGIBAb_Y[youtu.be/iXIgGIBAb_Y]**
+
+a|
+image::tallinn2023-1.jpg[fitrect="{fitrect}"]
+|===
+
+=== Celesta: writing business logic in Java ecosystem
+
+[{cols},{grid}]
+|===
+a|
+
+* Slides in Russian: https://inponomarev.github.io/celesta2023[inponomarev.github.io/celesta2023]
+
+.Presented at:
+
+* **31.05.2023 DevClub local meetup, Tallinn (in Russian) https://youtu.be/uweOD-OdZVo[youtu.be/uweOD-OdZVo]**
+
+a|
+image::tallinn2023-2.jpg[fitrect="{fitrect}"]
+|===
