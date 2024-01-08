@@ -53,9 +53,9 @@ In turn, if the average output time is lower than the average input time, it lea
 
 Thus, as we examine our graph, the following conclusions emerge:
 
-* The time of message processing in a queuing system is a function of the server throughput rate (stem:[\mu]) and the average incoming message arrival rate (stem:[\lambda]), and, to put it even simpler, it’s a function of the ratio of these values (stem:[\rho = \lamdba/\mu]).
+* The time of message processing in a queuing system is a function of the server throughput rate (stem:[\mu]) and the average incoming message arrival rate (stem:[\lambda]), and, to put it even simpler, it’s a function of the ratio of these values (stem:[\rho = \lambda/\mu]).
 
-*  When designing a queuing system, you need to evaluate the average incoming message arrival rate (stem:[\lambda]) and include the server throughput rate stem:[\mu >> \lambda]
+*  When designing a queuing system, you need to evaluate the average incoming message arrival rate (stem:[\lambda]) and include the server throughput rate stem:[\mu \gt\gt \lambda]
 
 *  Any queuing system is dependent on the ratio between stem:[\lambda] and stem:[\mu], and may exist in one of the three modes:
 
@@ -63,7 +63,7 @@ Thus, as we examine our graph, the following conclusions emerge:
 
  2. Near-saturation mode: stem:[\mu > \lambda], but not significantly. In this case, even slight alterations of the server throughput rate affect the system productivity parameters significantly in both directions. The server requires optimization! Meanwhile, even slight optimization may prove extremely beneficial for the entire system. The evaluation of the message arrival rate and our server’s throughput rate have demonstrated that our system had been functioning precisely near the "saturation point."
 
- 3. “Negligible queue waiting time” mode: stem:[\mu >> \lambda]. Total time in the system approximately equals the time required for processing by the server. The need to optimize the server is determined by external factors, such as the share of the queuing subsystem in the total processing time.
+ 3. “Negligible queue waiting time” mode: stem:[\mu \gt\gt \lambda]. Total time in the system approximately equals the time required for processing by the server. The need to optimize the server is determined by external factors, such as the share of the queuing subsystem in the total processing time.
 
 Having grappled with these issues, I started to optimize the event processor. This is how things have shaped up in the end:
 
