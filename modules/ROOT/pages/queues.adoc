@@ -16,13 +16,13 @@ The analytical results of queuing theory abound in rather rigorous math, and the
 
 However, even after merely skimming the surface of queuing theory, I discovered that the main conclusions applicable in our case are self-evident, their substantiation requires mere common sense, and they may be depicted on a graph of queuing system processing time as a function of the server throughput rate, as follows:
 
-image::fig1.png[width="70%"]
+image::fig1.png[width="50%"]
 
 Here
 
-* μ — server throughput rate (in messages per second)
+* stem:[\mu] — server throughput rate (in messages per second)
 
-* λ — average frequency of incoming requests (in messages per second)
+* stem:[\lambda] — average frequency of incoming requests (in messages per second)
 
 * Average message processing time is intercepted on the ordinate.
 
@@ -34,7 +34,7 @@ The rather simple fact that in its *right* part the graph asymptotically approac
 
 The only fact that may not seem apparent at first is that as μ approaches λ on the right side, the time of waiting in queue increases to infinity. In fact, if μ=λ, it means that the average message processing rate is equal to the average message input rate, and it intuitively seems that in this setup the system should be able to handle it. Why does the graph of time as a function of server productivity at point λ fly out into infinity, instead of behaving in the following manner?
 
-image::fig2.png[width="70%"]
+image::fig2.png[width="50%"]
 
 However, this fact can be established without in-depth mathematical analysis! For this purpose, one needs to understand that the server may exist in two modes as it processes messages: 1) busy, or 2) idle, when all requests have been processed, and no new ones have arrived in the queue.
 
@@ -53,17 +53,17 @@ In turn, if the average output time is lower than the average input time, it lea
 
 Thus, as we examine our graph, the following conclusions emerge:
 
-* The time of message processing in a queuing system is a function of the server throughput rate (μ) and the average incoming message arrival rate (λ), and, to put it even simpler, it’s a function of the ratio of these values (ρ=λ/μ).
+* The time of message processing in a queuing system is a function of the server throughput rate (stem:[\mu]) and the average incoming message arrival rate (stem:[\lambda]), and, to put it even simpler, it’s a function of the ratio of these values (stem:[\rho=\lamdba/\mu]).
 
-*  When designing a queuing system, you need to evaluate the average incoming message arrival rate (λ) and include the server throughput rate μ>>λ.
+*  When designing a queuing system, you need to evaluate the average incoming message arrival rate (stem:[\lambda]) and include the server throughput rate stem:[\mu \gg \lambda]
 
-*  Any queuing system is dependent on the ratio between λ and μ, and may exist in one of the three modes:
+*  Any queuing system is dependent on the ratio between stem:[\lambda] and stem:[\mu], and may exist in one of the three modes:
 
- 1. Abnormal mode — μ≤λ. The queue and the system processing time are increased indefinitely.
+ 1. Abnormal mode — stem:[\mu \leq \lambda]. The queue and the system processing time are increased indefinitely.
 
- 2. Near-saturation mode: μ>λ, but not significantly. In this case, even slight alterations of the server throughput rate affect the system productivity parameters significantly in both directions. The server requires optimization! Meanwhile, even slight optimization may prove extremely beneficial for the entire system. The evaluation of the message arrival rate and our server’s throughput rate have demonstrated that our system had been functioning precisely near the "saturation point."
+ 2. Near-saturation mode: stem:[\mu > \lambda], but not significantly. In this case, even slight alterations of the server throughput rate affect the system productivity parameters significantly in both directions. The server requires optimization! Meanwhile, even slight optimization may prove extremely beneficial for the entire system. The evaluation of the message arrival rate and our server’s throughput rate have demonstrated that our system had been functioning precisely near the "saturation point."
 
- 3. “Negligible queue waiting time” mode: μ>>λ. Total time in the system approximately equals the time required for processing by the server. The need to optimize the server is determined by external factors, such as the share of the queuing subsystem in the total processing time.
+ 3. “Negligible queue waiting time” mode: stem:[\mu \gg \lambda]. Total time in the system approximately equals the time required for processing by the server. The need to optimize the server is determined by external factors, such as the share of the queuing subsystem in the total processing time.
 
 Having grappled with these issues, I started to optimize the event processor. This is how things have shaped up in the end:
 

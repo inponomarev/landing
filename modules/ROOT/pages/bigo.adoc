@@ -45,7 +45,7 @@ a+\frac{b}{n}+c(n-1)
 
 With the following graph:
 
-image::brooks-en.png[width="70%"]
+image::brooks-en.png[width="50%"]
 
 Meanwhile, the efforts in man-hours are determined by the following formula:
 
@@ -62,7 +62,7 @@ This is essential knowledge for a project leader who has to decide whether or no
 
 Another classic example of a badly growing dependence is cited in all Agile methodology books. It's the increase in cost of change as a function of the project age.
 
-image::badproject-en.png[width="70%"]
+image::badproject-en.png[width="50%"]
 
 Once again, explaining this dependence is easy if you realize that the development of a programming project begins to resemble a complete graph, where project-related artifacts (programming modules, requirements, tests, documentation) are the vertices:
 
@@ -78,7 +78,7 @@ Despite the fact that the examples cited describe entirely different effects, it
 
 In the first case, the problem is resolved by the choice of algorithm or data structure with proper asymptotic behavior.
 
-In the second and third examples, the problem is in the non-linear growth of the number of connections in a complete graph. If your system resembles a complete graph, there's no reason to expect that an increase in the number of elements will lead to positive consequences. A model of a graph with connections has an illustrative or qualitative rather than quantitative nature, and the connection graph does not need to be complete in the strict sense of the word. For Brooks’ Law and the cost of change growth effect to manifest, the graph only needs to have a tendency towards completeness. On the other hand, the least number of connections that a graph with n of vertices can have is equal to n-1, such as, for example, in a star-type graph:
+In the second and third examples, the problem is in the non-linear growth of the number of connections in a complete graph. If your system resembles a complete graph, there's no reason to expect that an increase in the number of elements will lead to positive consequences. A model of a graph with connections has an illustrative or qualitative rather than quantitative nature, and the connection graph does not need to be complete in the strict sense of the word. For Brooks’ Law and the cost of change growth effect to manifest, the graph only needs to have a tendency towards completeness. On the other hand, the least number of connections that a graph with stem:[n] of vertices can have is equal to stem:[n-1], such as, for example, in a star-type graph:
 
 image::pic3.png[]
 
@@ -98,7 +98,7 @@ The effect described by Brooks should also be diminished by managing intra-proje
 
 The Agile approach provides a whole set of measures to attain O(1)-asymptotic behavior of the alteration cost increase. Besides the importance of communication management (including such radical methods as paired programming), special attention is heeded to development via testing. It involves the creation of rigid and isolated ‘functional requirement-test-code’ links that do not lead to the emergence of extraneous connections and all-around dependencies. The perfect dependence of alteration cost on the phase of the project, according to Agile, is as follows:
 
-image::xpproject-en.png[width="70%"]
+image::xpproject-en.png[width="50%"]
 
 As mentioned before, the idea articulated in this article lays on the surface. We, the developers, can evaluate the algorithm’s behavior as the task grows more complex. So, why not begin similarly forecasting the development project parameter behavior as the project grows and develops? We can optimize algorithms and get rid of unnecessary cycles and calculations. Why not optimize the entire development project, clearing out unneeded connections and dependences?
 
