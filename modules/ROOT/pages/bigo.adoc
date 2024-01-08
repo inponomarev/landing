@@ -22,19 +22,19 @@ The reason is, of course, the choice of a suboptimal algorithm or data structure
 
 Development project leaders are well aware of how the general order of things may deteriorate and grow complicated with the engagement of a new developer — unless you manage to give them a discrete, isolated task. The law described in the Fred Brooks’ classic https://en.wikipedia.org/wiki/The_Mythical_Man-Month[The Mythical Man-Month] states, “adding human resources to a late software project makes it later.” This statement has a very simple and mathematically precise explanation.
 
-The dependence of time required for a development project on the number of people involved is established by Brooks as follows: Let n be the number of developers working on the project. The total amount of work comprises: 
+The dependence of time required for a development project on the number of people involved is established by Brooks as follows: Let stem:[n] be the number of developers working on the project. The total amount of work comprises: 
 
 
 
-1. *Tasks that _cannot_ be partitioned.* Their completion time does not depend on the number of developers and equals a.
+1. *Tasks that _cannot_ be partitioned.* Their completion time does not depend on the number of developers and equals stem:[a].
 
-2. *Tasks that _can_ be partitioned.* Their completion time decreases with an increase in the number of developers and equals b/n.
+2. *Tasks that _can_ be partitioned.* Their completion time decreases with an increase in the number of developers and equals stem:[b/n].
 
-3. *Exchange of information.* Brooks writes, “If each part of the task must be separately coordinated with each other part, the effort increases as n(n-1)/2.” This means that if there are ndevelopers, the amount of effort spent on coordinating everyone is proportional to the number of links in a complete graph (a graph where each pair of vertices is connected):
+3. *Exchange of information.* Brooks writes, “If each part of the task must be separately coordinated with each other part, the effort increases as stem:[\frac{n(n-1)}{2}].” This means that if there are ndevelopers, the amount of effort spent on coordinating everyone is proportional to the number of links in a complete graph (a graph where each pair of vertices is connected):
 
 image::pic1.png[]
 
-Since the efforts are distributed between developers, their contribution to the completion time is described as c(n-1).
+Since the efforts are distributed between developers, their contribution to the completion time is described as stem:[c(n-1)].
 
 Thus, the total time required for project completion is defined by the following curve:
 
@@ -45,7 +45,7 @@ a+\frac{b}{n}+c(n-1)
 
 With the following graph:
 
-image::brooks-en.png[]
+image::brooks-en.png[width="70%"]
 
 Meanwhile, the efforts in man-hours are determined by the following formula:
 
@@ -62,7 +62,7 @@ This is essential knowledge for a project leader who has to decide whether or no
 
 Another classic example of a badly growing dependence is cited in all Agile methodology books. It's the increase in cost of change as a function of the project age.
 
-image::badproject-en.png[]
+image::badproject-en.png[width="70%"]
 
 Once again, explaining this dependence is easy if you realize that the development of a programming project begins to resemble a complete graph, where project-related artifacts (programming modules, requirements, tests, documentation) are the vertices:
 
@@ -98,7 +98,7 @@ The effect described by Brooks should also be diminished by managing intra-proje
 
 The Agile approach provides a whole set of measures to attain O(1)-asymptotic behavior of the alteration cost increase. Besides the importance of communication management (including such radical methods as paired programming), special attention is heeded to development via testing. It involves the creation of rigid and isolated ‘functional requirement-test-code’ links that do not lead to the emergence of extraneous connections and all-around dependencies. The perfect dependence of alteration cost on the phase of the project, according to Agile, is as follows:
 
-image::xpproject-en.png[]
+image::xpproject-en.png[width="70%"]
 
 As mentioned before, the idea articulated in this article lays on the surface. We, the developers, can evaluate the algorithm’s behavior as the task grows more complex. So, why not begin similarly forecasting the development project parameter behavior as the project grows and develops? We can optimize algorithms and get rid of unnecessary cycles and calculations. Why not optimize the entire development project, clearing out unneeded connections and dependences?
 

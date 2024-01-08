@@ -6,7 +6,7 @@ At a certain point, it became clear that we were not complying with this require
 
 I started with measuring the time spent by the message in various processing phases, and obtained the following approximate results (in seconds):
 
-image::pie1.png[]
+image::pie1.png[width="70%"]
 
 Thus, despite the fact that message processing takes up a rather small time period, it spends the most time in the queue. How is that possible? And the main issue is: what's the way to combat it? If the image above was the result of regular code profiling, it would be apparent: the procedure marked in red should be optimized. But the trouble is that in our case nothing happens in the red zone, the message is simply queued! It’s clear that message processing requires optimization (the yellow part of the diagram), but several questions emerge – how will this optimization affect the length of the queue and what are the guarantees that we will even be able to attain the desired result?
 
@@ -16,7 +16,7 @@ The analytical results of queuing theory abound in rather rigorous math, and the
 
 However, even after merely skimming the surface of queuing theory, I discovered that the main conclusions applicable in our case are self-evident, their substantiation requires mere common sense, and they may be depicted on a graph of queuing system processing time as a function of the server throughput rate, as follows:
 
-image::fig1.png[]
+image::fig1.png[width="70%"]
 
 Here
 
@@ -34,7 +34,7 @@ The rather simple fact that in its *right* part the graph asymptotically approac
 
 The only fact that may not seem apparent at first is that as μ approaches λ on the right side, the time of waiting in queue increases to infinity. In fact, if μ=λ, it means that the average message processing rate is equal to the average message input rate, and it intuitively seems that in this setup the system should be able to handle it. Why does the graph of time as a function of server productivity at point λ fly out into infinity, instead of behaving in the following manner?
 
-image::fig2.png[]
+image::fig2.png[width="70%"]
 
 However, this fact can be established without in-depth mathematical analysis! For this purpose, one needs to understand that the server may exist in two modes as it processes messages: 1) busy, or 2) idle, when all requests have been processed, and no new ones have arrived in the queue.
 
@@ -67,6 +67,6 @@ Thus, as we examine our graph, the following conclusions emerge:
 
 Having grappled with these issues, I started to optimize the event processor. This is how things have shaped up in the end:
 
-image::pie2.png[]
+image::pie2.png[width="70%"]
 
 Alright, now let’s optimize the message generation time!
