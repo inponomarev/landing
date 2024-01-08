@@ -2,6 +2,9 @@
 asciidoc:
   attributes:
       page-pagination: ''
+  extensions:
+    - "@djencks/asciidoctor-mathjax"
+
 site:
   title: Ivan Ponomarev, PhD
   start_page: ROOT::index.adoc
