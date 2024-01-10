@@ -1,5 +1,7 @@
 = Hidden Complexity of a Routine Task: Presenting Table Data in User Interface
 
+:stem: latexmath
+
 image::google.png[The result of the Google image search by 'grid component' keyword]
 
 _This article is a condensed recap of my http://2017.jpoint.ru/en/talks/hidden-complexity-of-a-routine-task-presenting-table-data-in-user-interface/[presentation] made at the https://jpoint.ru/en/[JPoint] conference._
