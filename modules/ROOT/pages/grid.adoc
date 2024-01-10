@@ -136,7 +136,7 @@ Therefore, we can estimate the probability of the function under consideration h
 
 [stem]
 ++++
-P(k, \lambda) = \frac{ \binom{k - k_{\text{min}} - 1}{\lambda - 1} \binom{k_{\text{max}} - (k - k_{\text{min}})}{\lambda_{\text{max}} - \lambda} }{ \binom{k_{\text{max}} - k_{\text{min}} - 1}{\lambda_{\text{max}} - 1} }
+P(k, \lambda) = \frac{ {k - k_{\text{min}} - 1 \choose \lambda - 1} {k_{\text{max}} - (k - k_{\text{min}}) \choose \lambda_{\text{max}} - \lambda} }{ {k_{\text{max}} - k_{\text{min}} - 1 \choose \lambda_{\text{max}} - 1} }
 ++++
 
 This is known as the https://en.wikipedia.org/wiki/Hypergeometric_distribution[hypergeometric distribution]. Its properties are well-studied; therefore, we can estimate the statistical parameters of the function of interest to us.
@@ -287,9 +287,9 @@ The formulas, using which we can calculate the enumerator’s direct and inverse
 
 [stem]
 ++++
-k = Nx + y \\
+k = Nx + y \
 
-x = \left\lfloor \frac{k}{N} \right\rfloor \\
+x = \lfloor \frac{k}{N} \rfloor \
 
 y = k \mod N
 ++++
