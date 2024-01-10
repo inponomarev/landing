@@ -289,9 +289,9 @@ The formulas, using which we can calculate the enumerator’s direct and inverse
 
 [stem]
 ++++
-k = Nx + y \
+k = Nx + y \\
 
-x = \lfloor \frac{k}{N} \rfloor \
+x = \left\lfloor \frac{k}{N} \right\rfloor \\
 
 y = k \mod N
 ++++
