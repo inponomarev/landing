@@ -2,7 +2,7 @@
 
 :stem: latexmath
 
-image::google.png[The result of the Google image search by 'grid component' keyword]
+image::google.png[The result of the Google image search by 'grid component' keyword,width="50%"]
 
 _This article is a condensed recap of my http://2017.jpoint.ru/en/talks/hidden-complexity-of-a-routine-task-presenting-table-data-in-user-interface/[presentation] made at the https://jpoint.ru/en/[JPoint] conference._
 
@@ -132,7 +132,7 @@ In general, this function lies close to the diagonal drawn between the points st
 
 Using combinatorics, we can easily estimate both the total number of possible distributions of records in the key space, and the number of possible combinations, in which the number of records with a key smaller than stem:[k] will be stem:[\lambda]:
 
-image::img.png[]
+image::img.png[width="50%"]
 
 Therefore, we can estimate the probability of the function under consideration having a value of λ at point k (provided that each of the combination of records in the key space is equally likely):
 
@@ -145,13 +145,13 @@ This is known as the https://en.wikipedia.org/wiki/Hypergeometric_distribution[h
 
 Its possible values lie within the boundaries of the parallelogram, the mathematical expectation lies on the diagonal of this parallelogram, and the standard deviation lies within the barrel-shaped figure inside the parallelogram:
 
-image::barrel.png[]
+image::barrel.png[width="50%"]
 
 Thus, the statistical estimate conveys to us that the approximation of this function with a line segment is the correct idea.
 
 In practice, of course, everything is usually more difficult than in theory. The following graph depicts the real distribution of key records in the Russian postal address directory, which contains over one million entries:
 
-image::russia.png[]
+image::russia.png[width="50%"]
 
 One look is sufficient to understand that while the function itself falls short of being a diagonal, calculating its values in just a few points and piecewise linear interpolation will provide us with an approximation of the function with the required accuracy. The approximation process converges very quickly along with an increase in the number of points: after all, each of the "pieces" of the function obeys the general properties, which means that it should lie within a small parallelogram and be largely located near this parallelogram’s diagonal.
 
@@ -195,7 +195,7 @@ Let’s display this directory, sorting it by the name of the area and the posta
 
 *Step 2.* We can take the interpolation table and substitute the number of the desired record into it, performing an inverse interpolation. The output produced is the approximate sequence number of the key.
 
-image::reverse.png[]
+image::reverse.png[width="50%"]
 
 This is a huge number, which requires over a hundred characters even in the hexadecimal notation! For instance, as mentioned above, in Java the `BigInteger` class can be used to operate with this number.
 
@@ -258,7 +258,7 @@ Let's say we want to position a grid on a record with postcode W2 1UD.
 
 *Step 4.* Insert the obtained number into the interpolation table and get the approximate number of the record: 1665834.
 
-image::forward.png[]
+image::forward.png[width="50%"]
 
 *Step 5.* Set the knob position of in accordance with this number, and return control to the user.
 
@@ -283,7 +283,7 @@ For integer or Boolean values, the situation is trivial: these data types number
 
 When `ORDER BY X, Y` sorting is used in a query, then at first the values of `X` are compared, and if they are equal, then the values of `Y` are also compared. This is the so-called lexicographic order. If it is known that the field `Y` can take only N values, then all possible combinations of `X` and `Y` values can be renumbered preserving the order, as shown in the figure below:
 
-image::pairs.png[]
+image::pairs.png[width="50%"]
 
 The formulas, using which we can calculate the enumerator’s direct and inverse function are trivial:
 
