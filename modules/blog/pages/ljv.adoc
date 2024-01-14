@@ -31,7 +31,7 @@ dot -Tpng myfile.dot > myfile.png
 or, even simpler, just paste the resulting script to https://dreampuf.github.io/GraphvizOnline/[GraphViz Online] and get a picture:
 
 [graphviz]
---
+----
 digraph Java {
 	rankdir="TB";
 	node[shape=plaintext]
@@ -61,7 +61,7 @@ digraph Java {
 	>];
 	n1 -> n2[label="value",fontsize=12];
 }
---
+----
 
 By calling configuration methods on the `LJV` object we can customize the way it visualizes data. We can choose fonts and colors for classes and fields, whether to hide null-valued fields, which objects should be represented only by their `toString` method invocation result, diagram drawing direction (top-to-bottom or left-to-right), etc., etc.
 
@@ -76,7 +76,7 @@ String graph = new LJV()
     .drawGraph(n1);
 
 [graphviz]
---
+----
 digraph Java {
 	rankdir="TB";
 	node[shape=plaintext]
@@ -121,7 +121,7 @@ digraph Java {
 	n3 -> n1[label="right",fontsize=12,color=blue,fontcolor=blue];
 	n1 -> n3[label="right",fontsize=12,color=blue,fontcolor=blue];
 }
---
+----
 
 The things that we see as a result of the visualization are, in my opinion, interesting and instructive not only for Java beginners but also for all the practicing Java engineers, even those who already know about the effects shown. 
 
@@ -142,7 +142,7 @@ new LJV().drawGraph("abcαβγ");
 ----
 
 [graphviz]
---
+----
 digraph Java {
     rankdir="TB";
     node[shape=plaintext]
@@ -168,7 +168,7 @@ digraph Java {
     >];
     n1 -> n2[label="value",fontsize=12];
 }
---
+----
 |
 
 [source,java]
@@ -223,7 +223,7 @@ new LJV().drawGraph("abcαβγ");
 ----
 
 [graphviz]
---
+----
 digraph Java {
 	rankdir="TB";
 	node[shape=plaintext]
@@ -260,7 +260,7 @@ digraph Java {
 	>];
 	n1 -> n2[label="value",fontsize=12];
 }
---
+----
 
 |===
 
@@ -279,7 +279,7 @@ new LJV().drawGraph(new String[]{
 --
 
 [graphviz]
---
+----
 digraph Java {
 	rankdir="TB";
 	node[shape=plaintext]
@@ -388,7 +388,7 @@ digraph Java {
 	n1:f3 -> n7[label="3",fontsize=12];
 }
 
---
+----
 
 == String interning
 
