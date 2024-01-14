@@ -2,6 +2,7 @@
   "dependencies": {
     "@antora/cli": "3.0.0",
     "@antora/site-generator": "3.0.0",
-    "@djencks/asciidoctor-mathjax": "^0.0.8"
+    "@djencks/asciidoctor-mathjax": "^0.0.8",
+    "asciidoctor-kroki": "0.17.0"
   }
 }

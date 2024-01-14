@@ -3,6 +3,7 @@ asciidoc:
   attributes:
       page-pagination: ''
   extensions:
+    - "asciidoctor-kroki"
     - "@djencks/asciidoctor-mathjax"
 
 site:
