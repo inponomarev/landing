@@ -1,0 +1,107 @@
+= Trouble-Free Database Migration: Idempotence and Convergence for DDL Scripts
+
+The SQL language and relational databases have been around for over 40 years. Over the course of this time, the SQL standard has been through numerous revisions and, apparently, its evolution is not about to stall. Relational databases have reigned completely in data storage and still dominate, with alternative approaches challenging them somewhat only in recent times.
+
+SQL is basically omnipotent where data retrieval is concerned. Not everyone is aware of this, but there is a https://thedailywtf.com/articles/Stupid-Coding-Tricks-The-TSQL-Madlebrot[SQL query] that plots the https://en.wikipedia.org/wiki/Mandelbrot_set[Mandelbrot set]. However, one issue continues to be somewhat poorly resolved: data schema migration. I believe that all of us have faced the difficulty of controlling the structure of a production database and upgrading it as new versions of the software were being deployed. Everyone is familiar with the challenges of ensuring database structure equivalence in both testing and development environments.
+
+This problem's relevance is especially clear in contrast with how drastically the task of source code version control has been resolved. Systems like Git allow you to control the collaborative work of numerous developers, not miss a single change, and easily conduct branching, integrating the results of teamwork into a whole. But all these excellent options begin to stagger when database schemas are involved.
+
+As we look for a data schema management solution, we discover that the database itself and the data definition language (DDL) are of no help.
+
+For instance, adding a field to the table requires an `ALTER TABLE ADD` command. There is sense in executing this statement only once, and only when 1) the table already exists, 2) the field is still missing from the table, and 3) the need for it is already present. A violation of any of these conditions either leads to an error in the execution of the script itself or, what’s worse, to the incorrect state of the database structure.
+
+How can all the developers' alterations be integrated into a single result, and how can its implementation be controlled?
+
+== Approach #1: Changelog
+
+The manual practical resolution of this task without any additional tools entails the creation of a folder with numbered DDL scripts in the project’s code base, their aggregation in this folder, and the introduction of the strictest discipline among the developers. The process of recording changes in every script file and the process of applying changes to the database should be formalized.
+
+A more advanced and convenient solution is the utilization of specialized tools that memorize the last script executed and ensure that structure modification scripts are executed in a linear order once and only once. http://www.liquibase.org/[Liquibase], https://flywaydb.org/[Flyway], https://github.com/pressly/goose[Goose], and http://dbdeploy.com/[dbdeploy] are some examples.
+
+These tools are of a great help to developers, but still do not make the migration task as convenient as modifying your application’s source code.
+
+The chief disadvantages of a change log-based approach are as follows:
+
+* *Changesets accumulate.* A long-term project has a whole "tail" of these scripts dragging behind. Most of them lose their relevance since they contain changes implemented a long time ago. Saving the whole "tail" may be pointless, as a change in one part of the log may override the result of the change in another part. It becomes impossible to obtain an up-to-date understanding of the database structure by examining the overstuffed log. And if we want to reproduce the database structure from scratch, we have to repeat its whole evolution process during script execution!
+
+* *A huge difference between the complexity of database structure modification via changesets and the simplicity of the source code alteration is apparent.* Let’s say you have the code that describes a class in your favorite programming language, and you need to add one method to the class and remove another. In this case, you go ahead and change the class code and then commit it to the VCS, right? You won't have to create a changeset like this: 
+
+[source,java]
+----
+alter class drop method foo;
+alter class add method bar(…) {
+…
+}
+----
+
+* *Branching.* If you use source code branching in your development process and would like to maintain the database structure, neither a changeset-based migration system nor a version control system will be of any assistance.
+
+The reason for these limitations is the fact that there is data in the database, and this data needs to be dealt with if the structure is altered. We’ll discuss this problem later on, but let’s take a look at another viable approach to resolving this problem.
+
+== Approach #2: Idempotent DDL Script
+
+Problems similar to those that emerge during database schema migration have long been around in server configuration. How can we automate the installation of the appropriate software on the server and ensure configuration upgrades? Is it possible to alter the infrastructure as easily as we alter the source code — namely, by introducing direct changes to the description of the desired state rather than by writing an additional changeset?
+
+Configuration management systems, such as Ansible, Chef, Puppet, etc. deal with these issues more than successfully. Idempotence and convergence are the two key principles at the core of all systems of this type. Both of these terms were borrowed from mathematics and have the following meaning:
+
+
+1. An idempotent and convergent script does not describe the operations on an object, but rather the state that an object needs to be rendered into.
+2. Idempotence means that if such a script is executed successfully and the object is already rendered into the required state, the repeated execution of the script will not change anything or lead to any results. For instance, assume a system configuration management script that declares the installation of the required packages: if these packages are already installed, then subsequent runs of this script will simply not execute any operations.
+3. Convergence means that if a script has not been executed or has failed to run successfully, the system will strive for the desired state during next script execution. For example, if a script execution was unsuccessful due to the loss of a network connection, then subsequent script execution will lead to the installation of the missed package (while the previously installed ones will remain in place).
+
+I believe that all of the above is already sufficient to understand how these principles can assist in controlling database schema. Let's assume that our database supports the `CONVERGE` keyword, and we have the following script:
+
+[source,sql]
+----
+CONVERGE TABLE OrderHeader(
+  id VARCHAR(30) NOT NULL,
+  date DATETIME DEFAULT GETDATE(),
+  customer_id VARCHAR(30),
+  customer_name VARCHAR(100),
+  CONSTRAINT Pk_OrderHeader PRIMARY KEY (id)
+);
+----
+
+The `CONVERGE` keyword should be interpreted by the database as “render the table into the desired structure.” The meaning is: if there isn't a table, create one; if there is one, see which fields are present, what types, indexes, foreign keys, default values, etc. are there and whether any alterations of the table are required in order to render it into the desired state.
+
+If databases could support such a keyword, i.e. if there was a possibility of writing idempotent and convergent DDL-scripts for databases, there would be no need for this article. We'd all simply have `CONVERGE TABLE` scripts in the system’s code base at hand, scripts that describe the required data schema. We'd deal with it just as with usual source code: add new fields to the table as needed and edit the index field set as required. Branching and merging these scripts in VCS would not cause any troubles.
+
+I can sense that you're wondering about actual data migration, but please sit tight, and I'll get to that soon.
+
+== Implementation of Idempotent DDL
+
+Unfortunately, the progress towards real DDL idempotence support in the world of relational databases is rather slow. For instance, in the recent years, the `CREATE IF NOT EXISTS` statement emerged, but to be entirely honest, it's a rather weak statement. The `CREATE IF NOT EXISTS` script does, of course, act as an idempotent one (won't throw an error if a table already exists) but not as a convergent one (won't modify the structure of an already existing table).
+
+That’s why we have to rely on external tools.
+
+The implementation of such tools is perfectly possible. For example, the MS Dynamics NAV ERP system has for many years been using the tactics of rendering the actual state of the database into the desired state based on the specifications.
+
+Moreover, such tools are surely demanded by developers. I’ve met with expert approval at numerous conferences and meetups where I shared the idea of an idempotent DDL.
+
+However, as of now, I am unaware of general-purpose tools (that aren’t built into the development platform) that implement idempotent DDL. That’s what inspired our team to launch https://github.com/CourseOrchestra/2bass[2bass], a new open-source project.
+
+In order to resemble a regular DDL script to developing tools (i.e. syntax highlighting and the ER-diagram visual editors), 2bass uses the `CREATE` keyword, although it has the meaning of a hypothetical `CONVERGE`. At every launch of the bass apply command, the system compares the actual structure of the connected database with the desired structure, described in an idempotent DDL script. If required, it executes the minimum requiredseries of `CREATE`/`ALTER`/`DROP` commands. As of today, four database types are supported: PostgreSQL, Oracle, MS SQL Server, and H2.
+
+One does not simply execute a set of idempotent statements in random order. As we know, certain database objects depend on others, i.e. tables refer to each other via foreign keys, views and indexes depend on tables, and so on. That's why prior to executing a series of object creation/alteration, they need to be arranged according to mutual dependence. To put it more precisely, the dependence graph has to be sorted topologically, and then we can start with objects that nothing depends on. A temporary reset of foreign keys is often required. These foreign keys are recovered after the modification of the tables that they link takes place. This feature is implemented in 2bass. It allows to securely run upgrades in the vast majority of cases.
+
+== Data Migration
+
+So, what should be done about data migration since a simple `ALTER` is not always sufficient? What can be done if we, for instance, want to add a `NOT NULL` field to a non-empty table and do not want to supply it with a `DEFAULT` value? If such a field is not filled with data somehow, the database will not allow executing an `ALTER TABLE ADD` script. And what happens if we decide to add a foreign key, but data in the table doesn’t satisfy this constraint? What if, for example, the application logic has changed and data needs to be moved from one column to another?
+
+All these questions are entirely valid, but for starters, let's note that the majority of alterations introduced to the database in the process of software development do not require migration, and a simple `ALTER` script is sufficient. You don't need to migrate data if you are merely adding a new table or a new column to the table (`NULLABLE` or with a `DEFAULT` value). You don't need to migrate data if you're adding or rebuilding an index. Nothing needs to be migrated if a view query is changed. My experience confirms that the vast majorityof alterations introduced by developers are precisely of this type.
+
+If data migration is really required, then yes, you'll need to write and execute a single-use migration script. You do not, however, need to save the script for the future, and the whole story with its implementation and fine-tuning is much simpler than in the changelog-based systems.
+
+Let's examine the case of a foreign key being added to a non-empty table, where some records do not satisfy this key. During the update, 2bass will attempt to create such a key using the `ALTER TABLE... ADD CONSTRAINT ... FOREIGN KEY` command. If it works, perfect! If not, 2bass exits and reports that it is unable to conduct a full update of a certain object for a specified reason, with a specific message from the database.
+
+There's nothing worse for a changelog system than a half-executed changeset that stalled. That's when the system is stuck between two revisions and the situation can only be straightened out manually. The lack of rollback support for DDL transactions in some database management systems presents additional problems.
+
+Incomplete updates are not an issue for convergent systems, unlike changelog systems, since for the purpose of `ALTER` command generation, the system compares the current actual state of the database with the desired state and tries to complete the alterations that have not been executed during the first attempt.
+
+When facing a situation where an update cannot be automatically executed (I'll repeat myself and remind you of how rarely this happens), you may write an ad hoc single-use script. For instance, it may be one that fills a reference table with required data, thus creating the conditions for 2bass to conduct an automatic update. You can fine-tune this script on a fresh copy of the production base, then execute it on the production base, and then execute a `bass apply` command.
+
+After all of this is done, you can simply throw outyour script because you'll never need it again! Your production database structure is already in the desired state, and if you decide to create a new database from scratch, then you won't need the database to follow the entire path that you've gone through in the course of its development.
+
+Perhaps this approach seems less reliable than using changelog systems, which force you to deliberate on the steps required for data migration at each structure alteration and about incorporating such steps in a changeset. But come to think of it, the professed reliability of changelog systems is mostly fictitious. Software without bugs does not exist, and this is quite true of data modification scripts. The fact that the changeset modification script was fine-tuned and performed correctly for your dataset does not actually provide a 100% guarantee of its error-free execution on any database. At least, in the case of idempotent DDL execution, we do not consider the data modification script unalterable, a revision attribute protected by the hash sum. In case of an error, we can always repeat the update attempts until we bring the system to the desired structure. Your data won't be lost since 2bass never automatically drops columns or tables with data, leaving this operation for manual execution.
+
+The given approach certainly has its limitations. For instance, it won’t work when your application is installed on dozens of databases, and you need to synchronize the structure of all the databases simultaneously. It won’t work when you need to execute data conversion scripts frequently due to the application’s peculiarities. At the same time, for most business applications that use a single production database, this approach works perfectly.
