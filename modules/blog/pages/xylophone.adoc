@@ -20,11 +20,11 @@ But everything can be totally different. The LGPL-licensed, Apache POI-based htt
 
 Xylophone implements the principle of differentiating data models and their representation. Data should be formed in an XML format (with no need to worry about cells, fonts anddividing lines), while Xylophone will form the results using an Excel template and a descriptor that describes your XML file’s traversal procedure, as shown on the diagram: 
 
-image::xylophone.png[]
+image::xylophone.png[width="50%"]
 
 The document template (xls/xlsx template) looks approximately as follows:
 
-image::xylophone-template.png[]
+image::xylophone-template.png[width="50%"]
 
 As a rule, a blank template is provided by the client himself. An engaged client will be happy to participate in the creation of a template: starting with selection of an appropriate form and up to the font sizes and the width of dividing lines. The advantage of a template is that small changes can be easily made when the report development has already been completed.
 
