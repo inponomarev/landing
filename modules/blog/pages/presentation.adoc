@@ -1,0 +1,255 @@
+= Presentation as Code: Why I Abandoned PowerPoint
+
+I must have created dozens of presentations for colleagues, customers, and public appearances over the course of my IT career. PowerPoint has been my most natural and reliable slide-making choice for many years. But this year the situation has changed radically. Between February and May, I had the chance to speak at five conferences, and the slides for the reports had to be prepared very quickly and in high quality. Delegating the part of the work that entailed visual slide design to other people did cross my mind.
+
+Once I tried to work with a designer by e-mailing .pptx files back and forth, but the work had turned into chaos: no one knew which version of the slides was the latest, and the layout was seriously off due to PowerPoint and the fonts' version discrepancies on our machines. That’s when I decided to try something new. I did try it, and I haven’t considered going back to PowerPoint since.
+
+== What We Want
+
+Some time ago, our company stopped using Word to create project documentation after being faced with the same problems over and over again: while Word is good for typing up small documents, as the document size grows, there are difficulties in collaborative work and arriving at quality uniform design. We’ve chosen https://asciidoctor.org/[AsciiDoctor], and we are incredibly happy with this choice, but it’s a topic for a whole other article.
+
+Around the same time, we realized the efficiency of one of the DevOps principles, namely, __everything as code__, so the requirements for the new presentation slide creation technology were pretty obvious:
+
+. The presentation must be a plain text file in a markup language.
+. Our slides are related to development projects, that’s why markup should allow one to insert the following information easily, without resorting to external systems:
+** code fragments with highlighted syntax
+** simple diagrams, i.e., geometric shapes connected by arrows
+** UML diagrams, flowcharts, and more
+. The presentation project should be stored in a version control system.
+. The slides should be validated and built in a CI system.
+
+There are two basic options today for creating slides in markup languages: the LaTeX https://en.wikibooks.org/wiki/LaTeX/Presentations[beamer] package or one of the frameworks for creating HTML/CSS slides (https://revealjs.com/[RevealJS], https://remarkjs.com/[remark], http://imakewebthings.com/deck.js/[deck.js], and many others).
+
+Although I’m all for LaTeX, I realized that choosing a solution that I won’t be using alone should probably be familiar to a wider circle of people. Not everyone is familiar with LaTeX, and if you don’t write scientific articles, then you probably don’t have enough time and motivation to immerse yourself in the vast, intricate world of this system.
+
+However, mastery of HTML/CSS is not a particularly common skill either: I, for one, don’t have a full mastery of it. Fortunately, the well-familiar AsciiDoctor comes to the rescue: the https://asciidoctor.org/docs/asciidoctor-revealjs/[asciidoctor-revealjs] converter allows you to create RevealJS slides using AsciiDoctor markup. And it’s very easy to learn and is accessible to everyone!
+
+== How to Code Slides
+
+It’s easiest to understand the essence of slide coding in AsciiDoctor using examples. All of them are from real slides that I made for my conference talks this year.
+
+A slide with a title and a list of items that open up successively:
+
+[source,asciidoc]
+----
+== Why Streams API?
+
+[%step]
+* Real-time stream processing
+* Stream-like API (map / reduce)
+* Under the hood:
+** Rebalancing
+** Persistent workers' state and replication 
+** Easy scaling
+----
+
+image::stepbystep.gif[]
+
+Title and a fragment of source code with highlighted syntax:
+
+[source,asciidoc]
+-----
+== Kafka Streams API application outline
+
+[source,java]
+----
+StreamsConfig config = ...;
+//Here we set various options
+
+Topology topology = new StreamsBuilder()
+//Here we build the topology
+....build();
+----
+-----
+
+image::kafka-streams-slide.png[]
+
+Demo code examples are subjected to alterations and improvements in the process of preparing the report, so the opportunity to quickly copy and paste the code from IDE directly into the slide is invaluable, which ensures the relevance of the demo example without worrying about syntax highlighting.
+
+Title, illustration, and text (the layout of the slide is made using the AsciiDoctor https://asciidoctor.org/docs/user-manual/#tables[tables]):
+
+[source,asciidoc]
+----
+== Kafka Streams in Action
+[.custom-style]
+[cols="30a,70a"]
+|===
+|image::KSIA.jpg[]
+|
+* **William Bejeck**, + 
+“Kafka Streams in Action”, November 2018
+* Code examples for Kafka 1.x
+|===
+----
+
+image::kstreams-in-action-slide.png[]
+
+Sometimes there is no need for a title, you can simply illustrate your thoughts with a full-screen image:
+
+[source,asciidoc]
+----
+[%notitle]
+== Living in Legacy is Hard
+
+image::swampman.jpg[canvas, size=cover]
+----
+
+image::swamp.jpg[]
+
+Often an idea needs to be supported by a simple diagram, i.e., squares connected by arrows. Fortunately, AsciiDoctor is integrated with Graphviz, a language that allows you to describe graph charts based on node descriptions and the relationships between them. You do need to master Graphviz, but the existing examples make the process easy! Here's what it looks like:
+
+[source,asciidoc]
+------
+== Coding “Bet Totalling App”
+
+What is the total payout when the certain outcome wins?
+
+[graphviz, "counting-topology.png"]
+-----
+digraph G {
+graph [ dpi = 150 ]; 
+rankdir="LR";
+node [fontsize=18; shape="circle"; fixedsize="true"; width="1.1"];
+Store [shape="cylinder"; label="Local Store"; fixedsize="true"; width="1.5"]
+Source -> MapVal -> Sum -> Sink
+Sum -> Store [dir=both; label=" \n "]
+{rank = same; Store; Sum;}
+}
+-----
+------
+
+image::bet-totaling-slide.png[]
+
+Whenever you need to edit the text within the node, change the arrow’s direction, etc., you can do it directly in the presentation code, instead of redrawing the picture elsewhere and reinserting it into the slide. This approach speeds up the process of working with slides dramatically.
+
+Here’s a more complicated example:
+
+[source,asciidoc]
+------
+== Non-reproducible build
+[graphviz, "unstable-update.png"]
+-----
+digraph G {
+  rankdir="LR";
+  graph [ dpi = 150 ];
+
+  u -> r0;
+  u[shape=plaintext; label="linter update\n+ 13 warnings"]
+  r0[shape=point, width = 0]
+  r1 -> r0[ arrowhead = none, label="master branch" ];
+
+  r0-> r2 [];
+  b1 -> b4;
+
+  r1->b1
+  r1[label="150\nwarnings"]
+  b1[label="± 0\nwarnings"]
+
+  b4[label="± 0\nwarnings"]
+  b4->r2
+  r2[label="163\nwarnings", color="red", xlabel=<<font color="red">merge blocked</font>>]
+  {rank = same; u; r0; b4;}
+}
+-----
+------
+
+image::non-reproducible-slide.png[]
+
+By the way, experimenting with Graphviz and fine-tuning the images can be conveniently done on the https://dreampuf.github.io/GraphvizOnline[Graphviz online] page.
+
+Finally, if you want to insert a flowchart, class diagram, or another UML diagram into the slide, then http://plantuml.com/[PlantUML], another system integrated with AsciiDoctor, may come to the rescue.
+
+[source,asciidoc]
+------
+== Intersection types
+
+[plantuml, intersections, png]
+----
+@startuml
+skinparam dpi 150 
+class Employee {
+}
+class Retiree {
+}
+class Person {
+  + getName(): String
+}
+interface Payable {
+  + getMonthPayment: BigDecimal
+}
+Payable <|.. Employee
+Payable <|.. Retiree
+Person <|-- Employee 
+Person <|-- Retiree
+Person <|-- Visitor
+@enduml
+----
+
+[source,java]
+----
+public <T extends Person & Payable> 
+  String getRandomNameAndPayment(List<T> items) {
+  T result =
+    items.get(
+        ThreadLocalRandom.current().nextInt(items.size()));
+    return result.getName() //from Person! 
+         + result.getPayment(); //from Payable!
+}
+----
+------
+
+image::intersection-type-slide.png[]
+
+Transformation of the presentation project into code stored on the version control system allows to work collaboratively on the presentation, separating the tasks of content creation and visual designing between the relevant people. Slide design (fonts, backgrounds, indents) is described in RevealJS using CSS. My personal CSS skills are best conveyed by this GIF
+
+image::css.gif[]
+
+...but that’s not a problem when there are people who are much faster and better at dealing with CSS than I am. It turns out that as the presentation deadline rapidly approaches, we can simultaneously work on different files through Git and collaborate at a speed that’s impossible to imagine when sending .pptx files by mail.
+
+== Compiling the Presentation to HTML
+
+Plain text sources are great, but how do you compile them into a presentation?
+
+AsciiDoctor is a Ruby project, and there are several ways to run it. First, you can install Ruby and run asciidoctor directly, which may probably be the best option for Ruby developers.
+
+If you don’t feel like messing with Ruby installation, you can use the https://github.com/asciidoctor/docker-asciidoctor[asciidoctor/docker-asciidoctor] Docker image, to which you can mount the project source folder via VOLUME and get the result in the specified location.
+
+The option I had settled on may seem somewhat surprising, but it’s most convenient for me as a Java developer. It doesn’t require Ruby installation or Docker, but does allow one to generate slides using a Maven script.
+
+In fact, the https://www.jruby.org/[JRuby] project (the Java implementation of the Ruby language) is so outstanding that it allows you to run almost everything that is created for Ruby in Java machine, and running AsciiDoctor is one of the most common JRuby use cases.
+
+The https://asciidoctor.org/docs/asciidoctor-maven-plugin/[asciidoctor-maven-plugin] allows us to build AsciiDoctor documentation. If you use Maven, AsciiDoctor and JRuby are automatically downloaded, and AsciiDoctor is executed in the JRuby environment: nothing needs to be installed manually! (Except for the `graphviz` package, which is required when using GraphViz or PlantUML graphics.) Just place your `.adoc` files in the `src/main/asciidoc/` folder. Here is an https://github.com/inponomarev/csa-hb/blob/master/pom.xml[example of a .pom file] that builds diagram slides.
+
+== Converting Slides to PDF
+
+Although the HTML version of the slides is completely self-sufficient (in Reveal JS, you can even open a ‘speaker view’ in a separate browser window with notes, timer and upcoming slide preview), sometimes a PDF version of the slides is also needed. First of all, some conferences that don’t allow the speaker to connect their own laptop, require slides “strictly in pptx or pdf format,” without realizing that they also come in HTML. Secondly, it’s good form to send the organizers a read-only PDF version of your slides as they were shown during your report, to be published in the conference materials.
+
+Fortunately, the Node.js https://github.com/astefanutti/decktape[decktape] utility can handle this task perfectly well. It’s built on https://pptr.dev/[Puppeteer], a Chrome browser automation system. You can convert RevealJS presentation to PDF using the following command:
+
+[source,shell]
+node decktape.js -s 3200x1800 --slides 1-500 \
+  reveal "file:///index.html?fragments=true" slides.pdf  
+
+There are two tricks, which I discovered via trial and error:
+
+* a double margin is required for resolution via the -s parameter, otherwise you may encounter problems with PDF layout,
+* in the URL of the HTML version of the presentation you need to pass the `?fragments=true parameter`, which will allow you to create a separate PDF page for each transitional state of your slide (for example, five pages for five list items, if they are displayed successively). This will make it possible to use this PDF on its own as a presentation when delivering a report.
+
+== Continuous Integration and Auto Web Publishing
+
+It’s convenient to get slides built automatically each time a change is commited to the version control system. And it’s even more convenient when the automatically compiled slides are posted online for collaborative use. Slides from the Internet can be easily “played” in front of an audience from any machine connected to the Internet and a projector.
+
+Since we use GitHub in our work, the natural CI system choice is Github CI, while for hosting ready-made presentations it’s https://pages.github.com/[github.io]. The concept behind github.io is that any static content placed in your GitHub project branch’s `gh-pages` can be accessed at `https://<your name>.gihub.io/<your project>`.
+
+The complete Github CI configuration file, including the Maven-assisted HTML page compilation, and pushing all the results to the `gh-pages` branch for publication on github.io looks as follows:
+https://github.com/inponomarev/mocks-talk/blob/master/.github/workflows/maven.yml
+
+Thus, each commit of the presentation code on GitHub will automatically rebuild the slides in HTML and PDF formats and reload them on github.io. (Of course, the only presentations you should upload to github.io are the ones you want to make public).
+
+== Project Examples
+
+Finally, here are the links to a couple of presentation projects with customized Maven scripts and CI configuration for Github, which you can clone and use when creating your own presentation projects:
+
+* https://github.com/inponomarev/kstreams-examples (my report at JPoint 2019)
+* https://github.com/inponomarev/kafka-hjs (my report at HolyJS 2020)
+
