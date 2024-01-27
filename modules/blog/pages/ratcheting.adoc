@@ -9,7 +9,7 @@ When reading these reviews, I get a feeling that we are talking about a magic el
 But there are no magic elixirs. I would like to talk about what is usually not spoken in posts like: what analyzers are not able to do, what's their real part and place in the process of software delivery, and how to implement the analysis properly.
 
 .Ratchet (source: https://ru.wikipedia.org/wiki/%D0%A5%D1%80%D0%B0%D0%BF%D0%BE%D0%B2%D0%BE%D0%B9_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC#/media/File:Sperrklinke_Schema.svg[Wikipedia])
-image::ratchet.png[]
+image::ratchet.png[width="50%"]
 
 == What Static Analyzers Will Never Be Able to Do
 
@@ -58,14 +58,14 @@ Changes rejected at the N-th stage of the pipeline are not passed on stage N+1.
 Why so and not otherwise? In the part of the pipeline which deals with testing, testers recognize the well-known test pyramid:
 
 .Test pyramid. Source: https://martinfowler.com/bliki/TestPyramid.html[the article] by Martin Fowler.
-image::test_pyramid.png[]
+image::test_pyramid.png[width="50%"]
 
 At the bottom of this pyramid, there are tests that are easier to write, which are executed faster and don't tend to produce false positives. Therefore, there should be more of them, they should cover most of the code, and should be executed first. At the top of the pyramid, the situation is quite the opposite, so the number of integration and UI tests should be reduced to the necessary minimum. People in this chain are the most expensive, slow, and unreliable resource, so they are located at the very end and do the work only if the previous steps haven't detected any defects. In the parts not related to testing, the pipeline is built by the same principles!
 
 I'd like to suggest the analogy in the form of a multistage system of water filtration. Dirty water (changes with defects) is supplied in the input, and as the output we need to get clean water, which won't contain all unwanted contaminations.
 
 .Multi-stage filter. Source: https://commons.wikimedia.org/wiki/File:Milli-Q_Water_filtration_station.JPG[Wikimedia Commons]
-image::water_filter.jpeg[]
+image::water_filter.jpeg[width="60%"]
 
 As you may know, purification filters are designed so that each subsequent stage is able to remove contaminant particles of smaller size. Input stages of rough purification have greater throughput and lower cost. In our analogy, it means that input quality gates have greater performance, require less effort to launch, and have less operating costs. The role of static analysis, which (as we now understand) is able to weed out only the most serious defects, is the role of the sump filter as the first stage of the multi-stage purifiers.
 

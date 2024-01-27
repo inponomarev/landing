@@ -20,11 +20,11 @@ But everything can be totally different. The LGPL-licensed, Apache POI-based htt
 
 Xylophone implements the principle of differentiating data models and their representation. Data should be formed in an XML format (with no need to worry about cells, fonts anddividing lines), while Xylophone will form the results using an Excel template and a descriptor that describes your XML file’s traversal procedure, as shown on the diagram: 
 
-image::xylophone.png[width="50%"]
+image::xylophone.png[width="60%"]
 
 The document template (xls/xlsx template) looks approximately as follows:
 
-image::xylophone-template.png[width="50%"]
+image::xylophone-template.png[]
 
 As a rule, a blank template is provided by the client himself. An engaged client will be happy to participate in the creation of a template: starting with selection of an appropriate form and up to the font sizes and the width of dividing lines. The advantage of a template is that small changes can be easily made when the report development has already been completed.
 
@@ -49,7 +49,7 @@ If there were no recurring elements in the form that we are creating (such as th
 
 What do we do if recurring elements are required in our report? You can naturally represent them as recurring XML elements, and the descriptor helps to appropriately iterate them. The repetition of elements in the report may have either a vertical direction (for instance, when we insert lines into a packing list), or a horizontal one (when we insert the columns in an analytical report). We can use XML element nesting in order to reflect the repetitive report element nesting of any given degree of depth.
 
-image::layout.png[]
+image::layout.png[width="60%"]
 
 (Cells that will form the top left corner of a subsequent rectangular fragment that will be joined by the report generator, are marked by red rectangles.)
 
