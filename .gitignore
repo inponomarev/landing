@@ -2,3 +2,4 @@
 node_modules
 build
 .asciidoctor
+/modules/ROOT/attachments/cv.pdf

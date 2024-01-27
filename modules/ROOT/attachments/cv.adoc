@@ -73,7 +73,12 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 
 === Work in education
 
-**February 2022 — present**
+**September 2023 — present**
+
+[none]
+* **Northeastern University London** (https://www.nulondon.ac.uk/[nulondon.ac.uk]). Teaching Assistant, Lecturer
+
+**February 2022 — May 2023**
 
 [none]
 * **Estonian Enterpreneurship University of Applied Sciences** (https://www.euas.eu[euas.eu]). Lecturer.
@@ -88,17 +93,17 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 
 **Program Committee member** of the following conferences:
 
-**autumn 2020 — present**
+**autumn 2020 — autumn 2023**
 
 [none]
 * **Heisenbug** https://heisenbug.ru/en/[heisenbug.ru/en] -- engineering approaches to quality assurance in software.
 
-**autumn 2021 — present**
+**autumn 2021 — autumn 2023**
 
 [none]
 * **Hydra** https://hydraconf.com/[hydraconf.com] -- concurrent and distributed computing.
 
-**spring 2022 — present**
+**spring 2022 — autumn 2023**
 
 [none]
 * **Flow** https://flowconf.ru/en/[flowconf.ru/en]  -- systems and business analysis. 
@@ -113,7 +118,7 @@ https://ponomarev.uk/talks-portfolio.html[ponomarev.uk/talks-portfolio.html]
 Follow these links to see lists of blog posts on the respective platforms:
 
 ** **Habr** https://habr.com/ru/users/ivanponomarev/posts/[habr.com/ru/users/ivanponomarev/posts/]
-** **DZone** https://dzone.com/users/3168637/iponomarev.html[dzone.com/users/3168637/iponomarev.html] 
+** **DZone** https://dzone.com/users/3168637/iponomarev.html[dzone.com/users/3168637/iponomarev.html] (archived version: https://ponomarev.uk/blog/[ponomarev.uk/blog]).
 ** **Confluent**  https://www.confluent.io/blog/author/ivan-ponomarev/[confluent.io/blog/author/ivan-ponomarev]
 
 

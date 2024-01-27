@@ -13,10 +13,10 @@ This is a list of my conference talks for the last 5 years, grouped by years and
 |===
 a|* Description and video of JPoint2017 version: https://jugspeakers.info/information/talks/talk/446[jugspeakers.info/information/talks/talk/446]
 
-* Blog post in English: https://dzone.com/articles/hidden-complexity-of-a-routine-task-presenting-tab[dzone.com/articles/hidden-complexity-of-a-routine-task-presenting-tab]
+* Blog post in English: dzone.com/articles/hidden-complexity-of-a-routine-task-presenting-tab, xref:blog:grid.adoc[archived version]
 * Blog post in Russian, extended version: 
 ** Part 1: https://habr.com/post/278773/[habr.com/post/278773]
-** Part 2: https://habr.com/post/279083/[habr.com/post/279083]   
+** Part 2: https://habr.com/post/279083/[habr.com/post/279083] 
 
 
 .Presented at:
@@ -33,7 +33,7 @@ a|image::jpoint2017.jpg[fitrect="{fitrect}"]
 |===
 a|
 * Description and video: https://jugspeakers.info/information/talks/talk/1950[jugspeakers.info/information/talks/talk/1950]
-* Blog post in English: https://dzone.com/articles/celesta-sql-databases-api-schema-migration-and-tes[dzone.com/articles/celesta-sql-databases-api-schema-migration-and-tes]
+* Blog post in English: dzone.com/articles/celesta-sql-databases-api-schema-migration-and-tes, xref:blog:celesta.adoc[archived version]
 * Blog post in Russian (updated version): https://habr.com/post/455746/[habr.com/post/455746]
 
 .Presented at:
@@ -164,7 +164,7 @@ image:joker2020.jpg[fitrect="{fitrect}"]
 a|
 * Description and video of the SnowOne 2021 version: https://jugspeakers.info/information/talks/talk/2895[jugspeakers.info/information/talks/talk/2895]
 
-* Blog post in English: https://dzone.com/articles/what-can-we-learn-from-java-data-structures-visual[dzone.com/articles/what-can-we-learn-from-java-data-structures-visual]
+* Blog post in English: dzone.com/articles/what-can-we-learn-from-java-data-structures-visual, xref:blog:ljv.adoc[archived version]
 
 * Blog post in Russian (extended version) https://habr.com/post/599045/[habr.com/post/599045].
 

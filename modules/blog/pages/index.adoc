@@ -1,6 +1,6 @@
 = Technical Blog
 
-Some years ago, I published several technical blog posts on the DZone.com platform. Unfortunately, for some obscure reason, DZone decided to hide some of the older blog posts and now requires registration to access them. Since I believe that many of my older posts still hold value, I have decided to republish them here, making them easily accessible and searchable by search engines.
+Several years ago, I published technical blog posts on the DZone.com platform. Unfortunately, for some obscure reason, DZone decided to hide certain older blog posts and now requires registration to access them. Since I believe that many of my older posts still hold value, I have decided to republish them here, making them easily accessible and searchable by search engines.
 
 
 * xref:variance.adoc[Type Variance in Java and Kotlin] (January 4, 2023)
