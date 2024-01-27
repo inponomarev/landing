@@ -67,7 +67,12 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 
 == Work in education
 
-**February 2022 — present**
+**September 2023 — present**
+
+[none]
+* **Northeastern University London** (https://www.nulondon.ac.uk/[nulondon.ac.uk]). Teaching Assistant, Lecturer
+
+**February 2022 — May 2023**
 
 [none]
 * **Estonian Enterpreneurship University of Applied Sciences** (https://www.euas.eu[euas.eu]). Lecturer.
@@ -82,17 +87,17 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 
 **Program Committee member** of the following conferences:
 
-**autumn 2020 — present**
+**autumn 2020 — autumn 2023**
 
 [none]
 * **Heisenbug** https://heisenbug.ru/en/[heisenbug.ru/en] -- engineering approaches to quality assurance in software.
 
-**autumn 2021 — present**
+**autumn 2021 — autumn 2023**
 
 [none]
 * **Hydra** https://hydraconf.com/[hydraconf.com] -- concurrent and distributed computing.
 
-**spring 2022 — present**
+**spring 2022 — autumn 2023**
 
 [none]
 * **Flow** https://flowconf.ru/en/[flowconf.ru/en]  -- systems and business analysis. 

@@ -1,0 +1,161 @@
+= Running IntelliJ IDEA in Jenkins
+
+It may be argued that IntelliJ IDEA has the most advanced static Java code analyzer, whose capabilities leaves "veterans" like http://checkstyle.sourceforge.net/[Checkstyle] and https://spotbugs.github.io/[Spotbugs] far behind. Its many “inspections” check various aspects of the code, from coding style to certain kinds of bugs.
+
+However, as long as the results of the analysis are visible only to a sole developer in her IDE, they are of little use in the software delivery process. Static analysis xref:ratcheting.adoc[should be performed] as the first step of the delivery pipeline, and the build should fail if the results of this step don’t pass quality gates. JetBrains' TeamCity CI is known to be integrated with IDEA. Less known is the fact that even if you are not using TeamCity, you may run IDEA inspections on any other CI server. Let’s see how this may be done using the IDEA Community Edition, Jenkins, and the Warnings NG plugin.
+
+== Step 1: Run the Analysis in The Docker Container and Produce a Report
+
+Initially, the idea of running an IDE (a desktop application!) inside a CI system without a graphic interface may seem dubious and very challenging. Fortunately, IDEA developers have provided the option of running https://www.jetbrains.com/help/idea/command-line-formatter.html[code formatting] and the https://www.jetbrains.com/help/idea/command-line-code-inspector.html[code inspector] from the command line. Moreover, a graphics subsystem is not required to run IDEA in this mode, and these tasks can be performed on servers where only a text shell is available.
+
+Inspections are run using the `bin/inspect.sh` script from the IDEA installation directory. The following parameters are required:
+
+* The complete path to the project (relative paths are not supported),
+
+* A path to the .xml file with inspection settings (usually located inside the project in `.idea/inspectionProfiles/Project_Default.xml`),
+
+* A complete path to the folder to which .xml files with analysis results reports will be added.
+
+In addition, the following is expected:
+
+* The path to the Java SDK should be configured in the IDE; otherwise, the analysis will not work. These settings are contained in the `jdk.table.xml` configuration file in the IDEA global configuration folder. The global IDEA configuration itself is located in the user's home directory by default, but this location can be specified in the `idea.properties` file.
+
+* The analyzed project must be a valid IDEA project, for which purpose certain files that are usually ignored will have to be committed to version control, i.e.:
+
+** `.idea/inspectionProfiles/Project_Default.xml` — analyzer settings that will be explicitly used when launching inspections in the container;
+
+** `.idea/modules.xml` — otherwise, we will get the "This project contains no modules" error message;
+
+** `.idea/misc.xml` — otherwise, we will get the "The JDK is not configured properly for this project" error message;
+
+** `.iml-files` — otherwise, we will get an error message regarding a non-configured JDK in the module.
+
+Although these files are usually included in `.gitignore`, they do not contain any information specific to a particular developer’s environment — unlike, for example, the `workspace.xml` file, which does contain such information, thus there is no need to commit it.
+
+Using Docker to pack the JDK together with IDEA Community Edition and its configuration files in a single container seems like a perfect way out. After we select the appropriate base image, here’s the Dockerfile we get:
+
+[source,dockerfile]
+----
+FROM openkbs/ubuntu-bionic-jdk-mvn-py3
+
+ARG INTELLIJ_VERSION="ideaIC-2019.1.1"
+
+ARG INTELLIJ_IDE_TAR=${INTELLIJ_VERSION}.tar.gz
+
+ENV IDEA_PROJECT_DIR="/var/project"
+
+WORKDIR /opt
+
+COPY jdk.table.xml /etc/idea/config/options/
+
+RUN wget https://download-cf.jetbrains.com/idea/${INTELLIJ_IDE_TAR} && \
+    tar xzf ${INTELLIJ_IDE_TAR} && \
+    tar tzf ${INTELLIJ_IDE_TAR} | head -1 | sed -e 's/\/.*//' | xargs -I{} ln -s {} idea && \
+    rm ${INTELLIJ_IDE_TAR} && \
+    echo idea.config.path=/etc/idea/config >> idea/bin/idea.properties && \
+    chmod -R 777 /etc/idea
+
+CMD idea/bin/inspect.sh ${IDEA_PROJECT_DIR} ${IDEA_PROJECT_DIR}/.idea/inspectionProfiles/Project_Default.xml ${IDEA_PROJECT_DIR}/target/idea_inspections -v2
+----
+
+Using the `idea.config.path` option, we have forced IDEA to search for its global configuration in the `/etc/idea` folder, because when we work on CI server or in Docker, the user's home directory is a thing that is ambiguous and often even completely missing.
+
+This is what the `jdk.table.xml` file looks like when being copied to the container, with specified paths to the OpenJDK installed inside the container (it may be based on a similar file from your own directory with IDEA settings):
+
+
+[source,xml]
+----
+<application>
+ <component name="ProjectJdkTable">
+   <jdk version="2">
+     <name value="1.8" />
+     <type value="JavaSDK" />
+     <version value="1.8" />
+     <homePath value="/usr/java" />
+     <roots>
+       <annotationsPath>
+         <root type="composite">
+           <root url="jar://$APPLICATION_HOME_DIR$/lib/jdkAnnotations.jar!/" type="simple" />
+         </root>
+       </annotationsPath>
+       <classPath>
+         <root type="composite">
+           <root url="jar:///usr/java/jre/lib/charsets.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/deploy.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/access-bridge-64.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/cldrdata.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/dnsns.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/jaccess.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/jfxrt.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/localedata.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/nashorn.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/sunec.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/sunjce_provider.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/sunmscapi.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/sunpkcs11.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/ext/zipfs.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/javaws.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/jce.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/jfr.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/jfxswt.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/jsse.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/management-agent.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/plugin.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/resources.jar!/" type="simple" />
+           <root url="jar:///usr/java/jre/lib/rt.jar!/" type="simple" />
+         </root>
+       </classPath>
+     </roots>
+     <additional />
+   </jdk>
+ </component>
+</application>
+----
+
+The image is https://hub.docker.com/r/inponomarev/intellij-idea-analyzer[available on Docker Hub].
+
+Before moving on, let’s check the IDEA analyzer’s launch in the container:
+
+[source,shell]
+docker run --rm -v <path/to/your/project>:/var/project inponomarev/intellij-idea-analyzer
+
+The analysis should work out successfully, and numerous .xml files with analyzer reports should appear in the `target/idea_inspections` subfolder.
+
+Now there are no longer any doubts that the IDEA analyzer can be run in any CI environment, and we are moving on to the second step.
+
+== Step 2: Display and Analyze the Report
+
+Getting a report in the form of .xml files is half the battle; now we need to make it comprehensible to humans. Also, its results should be used in quality gates — the logic of determining whether an accepted change passes or does not pass the quality criteria.
+
+Jenkins https://github.com/jenkinsci/warnings-ng-plugin[Warnings NG Plugin], released in January 2019, will come in handy in doing that. Its emergence has made numerous individual plugins obsolete for working with static analysis results in Jenkins (CheckStyle, FindBugs, PMD, etc.).
+
+The plugin contains two parts:
+
+* Numerous analyzer message collectors (the https://github.com/jenkinsci/warnings-ng-plugin/blob/master/SUPPORTED-FORMATS.md[full list] includes every analyzer known to man, from AcuCobol to ZPT Lint);
+
+* A single report viewer for all of them.
+
+The list of what Warnings NG can analyze includes warnings from the Java compiler and the Maven runtime logs: although they are constantly in sight, they are seldom expressly analyzed. IntelliJ IDEA inspections reports are also among the recognized formats.
+
+Since the plugin is new, it works well with Jenkins Pipeline from the start. The build step that utilizes it will look like this (we just tell the plug-in which report format we are recognizing and which files should be scanned):
+
+[source,groovy]
+----
+stage ('Static analysis'){
+    sh 'rm -rf target/idea_inspections'
+    docker.image('inponomarev/intellij-idea-analyzer').inside {
+       sh '/opt/idea/bin/inspect.sh $WORKSPACE $WORKSPACE/.idea/inspectionProfiles/Project_Default.xml $WORKSPACE/target/idea_inspections -v2'
+    }
+    recordIssues(
+       tools: [ideaInspection(pattern: 'target/idea_inspections/*.xml')]
+    )
+}
+----
+
+The report interface looks like this:
+
+image::idea-report.png[]
+
+Conveniently, this interface is universal for all recognized analyzers. It contains an interactive diagram of the distribution of analyzer warnings by category and a graph of the change dynamics in the number of warnings. The grid at the bottom of the page can be used to perform a quick search. The only thing that didn’t work correctly for IDEA inspections was the ability to browse the code directly in Jenkins (although for other reports, such as Checkstyle, this plugin can do it perfectly). This seems to be an IDEA report parser bug that’s yet to be fixed.
+
+Among the features of Warnings NG is the fact that it allows its users to collect warnings from different sources in one report and program different types of quality gates, including the “ratchet” based on reference build. Some quality gates programming documentation is available https://github.com/jenkinsci/warnings-ng-plugin/blob/master/doc/Documentation.md#quality-gate-configuration[here] — unfortunately, it’s far from being complete, and one has to refer to the source code. On the other hand, the “ratchet” can be implemented independently for complete control over what is happening (see my xref:ratcheting.adoc[previous post] on this topic).

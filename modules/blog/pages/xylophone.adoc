@@ -158,11 +158,11 @@ The descriptor's elements are described in their entirety in the https://courseo
 
 ** `name="tagname[@]"` — elements with a specific name and attribute value.
 
-** `name="(before)"`,  `name="(after)"`  — “virtual” elements that precede an iteration and conclude an iteration.
+** `name="(before)"`, `name="(after)"` — “virtual” elements that precede an iteration and conclude an iteration.
 
-* `iteration` — transition to the iteration mode. May only be located within an  `element`. Different parameters may be set, for instance.
+* `iteration` — transition to the iteration mode. May only be located within an `element`. Different parameters may be set, for instance.
 
-** `mode="horizontal"`  — horizontal output mode (vertical be default).
+** `mode="horizontal"` — horizontal output mode (vertical be default).
 
 ** `index=0` — restrict the iteration exclusively to the first encountered element.
 
@@ -210,7 +210,7 @@ The `XML2Spreadsheet` class has several overloaded versions of the `process` sta
 
 An important option that I haven’t mentioned yet is the opportunity to choose between the DOM and SAX parsers at the stage of parsing a file with XML data. As we know, the DOM parser uploads the entire file to memory, constructs its objective representation and allows you to traverse its contents in a random manner (including the repeated return to the same element). The SAX parser never places the entire file in memory, instead, it processes it as a ‘stream’ of elements, without the option of returning to the same element.
 
-Using the SAX mode in Xylophone (via the command prompt option  `–sax`, or by setting the value of the  `useSax`  parameter of  `XML2Spreadsheet.process(..)`  method to  `true`) may prove crucially useful in cases when very large files need to be generated. Due to the speed and cost efficiency of SAX parsing the file generation speed increase several-fold. This comes at a price of small restrictions on the descriptor (described in the documentation), but in the majority of cases the reports satisfy these requirements, which is why I’d recommend you use the SAX-mode anywhere you can.
+Using the SAX mode in Xylophone (via the command prompt option `–sax`, or by setting the value of the `useSax` parameter of `XML2Spreadsheet.process(..)` method to `true`) may prove crucially useful in cases when very large files need to be generated. Due to the speed and cost efficiency of SAX parsing the file generation speed increase several-fold. This comes at a price of small restrictions on the descriptor (described in the documentation), but in the majority of cases the reports satisfy these requirements, which is why I’d recommend you use the SAX-mode anywhere you can.
 
 I hope that you'll like this way of uploading data to Excel via Xylophone, and it will save you time and some nerve cells – as it did for us.
 

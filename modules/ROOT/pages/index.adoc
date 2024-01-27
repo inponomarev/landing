@@ -25,7 +25,17 @@ See my https://www.linkedin.com/in/inponomarev/[linkedin profile] for my CV in S
 
 == Experience in education
 
-**https://www.euas.eu[Estonian Enterpreneurship University of Applied Sciences]** (February 2022 — present)
+**https://www.nulondon.ac.uk/[Northeastern University London]**
+
+[none]
+* Lecturer (Spring 2024)
+** Fundamentals of Computer Science II (Java & Data Structures)
+
+[none]
+* Teaching Assistant (Autumn 2023)
+** Discrete Structures
+
+**https://www.euas.eu[Estonian Enterpreneurship University of Applied Sciences]** (February 2022 — May 2023)
 
 [none]
 * Lecturer.
