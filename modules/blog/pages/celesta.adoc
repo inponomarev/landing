@@ -41,7 +41,7 @@ Celesta does not allow for object-relational mapping as is, because the data mod
 
 It is possible to achieve the same behavior of the code running with all the supported RDBMS only for the features implemented more or less similarly in each of them. If we use the Euler diagram to represent the sets of features of supported databases, we get the following result:
 
-image::sql-euler.png[]
+image::sql-euler.png[width="60%"]
 
 If we ensure full independence from the database type, the functional capabilities for Celesta users must lie in the intersection of all the feature sets. And at first glance, this seems to be a major limitation. Certainly, some specific features of, say, MS SQL Server, are inaccessible for us. But, all relational databases support tables, foreign keys, views, sequences, and SQL queries with JOIN and GROUP BY statements. These are the tools we can provide to developers. We offer a "generalized SQL" that is transpiled to SQL queries for respective database dialects and call it CelestaSQL.
 

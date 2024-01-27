@@ -17,7 +17,7 @@ jobs:
            docker run --rm -v $PWD:/documents/ curs/asciidoctor-od a-od cv.adoc pdf template.fodt
            git config --global user.email "docs@ponomarev.uk"
            git config --global user.name "Github Actions"
-           git add cv.pdf
+           git add -f cv.pdf
            git commit -m "temp update" --allow-empty
         working-directory: modules/ROOT/attachments
 
