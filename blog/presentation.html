@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Presentation as Code: Why I Abandoned PowerPoint</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>I must have created dozens of presentations for colleagues, customers, and public appearances over the course of my IT career. PowerPoint has been my most natural and reliable slide-making choice for many years. But this year the situation has changed radically. Between February and May, I had the chance to speak at five conferences, and the slides for the reports had to be prepared very quickly and in high quality. Delegating the part of the work that entailed visual slide design to other people did cross my mind.</p>
+</div>
+<div class="paragraph">
+<p>Once I tried to work with a designer by e-mailing .pptx files back and forth, but the work had turned into chaos: no one knew which version of the slides was the latest, and the layout was seriously off due to PowerPoint and the fonts' version discrepancies on our machines. That’s when I decided to try something new. I did try it, and I haven’t considered going back to PowerPoint since.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_we_want"><a class="anchor" href="#_what_we_want"></a>What We Want</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Some time ago, our company stopped using Word to create project documentation after being faced with the same problems over and over again: while Word is good for typing up small documents, as the document size grows, there are difficulties in collaborative work and arriving at quality uniform design. We’ve chosen <a href="https://asciidoctor.org/">AsciiDoctor</a>, and we are incredibly happy with this choice, but it’s a topic for a whole other article.</p>
+</div>
+<div class="paragraph">
+<p>Around the same time, we realized the efficiency of one of the DevOps principles, namely, <em>everything as code</em>, so the requirements for the new presentation slide creation technology were pretty obvious:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The presentation must be a plain text file in a markup language.</p>
+</li>
+<li>
+<p>Our slides are related to development projects, that’s why markup should allow one to insert the following information easily, without resorting to external systems:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>code fragments with highlighted syntax</p>
+</li>
+<li>
+<p>simple diagrams, i.e., geometric shapes connected by arrows</p>
+</li>
+<li>
+<p>UML diagrams, flowcharts, and more</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>The presentation project should be stored in a version control system.</p>
+</li>
+<li>
+<p>The slides should be validated and built in a CI system.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>There are two basic options today for creating slides in markup languages: the LaTeX <a href="https://en.wikibooks.org/wiki/LaTeX/Presentations">beamer</a> package or one of the frameworks for creating HTML/CSS slides (<a href="https://revealjs.com/">RevealJS</a>, <a href="https://remarkjs.com/">remark</a>, <a href="http://imakewebthings.com/deck.js/">deck.js</a>, and many others).</p>
+</div>
+<div class="paragraph">
+<p>Although I’m all for LaTeX, I realized that choosing a solution that I won’t be using alone should probably be familiar to a wider circle of people. Not everyone is familiar with LaTeX, and if you don’t write scientific articles, then you probably don’t have enough time and motivation to immerse yourself in the vast, intricate world of this system.</p>
+</div>
+<div class="paragraph">
+<p>However, mastery of HTML/CSS is not a particularly common skill either: I, for one, don’t have a full mastery of it. Fortunately, the well-familiar AsciiDoctor comes to the rescue: the <a href="https://asciidoctor.org/docs/asciidoctor-revealjs/">asciidoctor-revealjs</a> converter allows you to create RevealJS slides using AsciiDoctor markup. And it’s very easy to learn and is accessible to everyone!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_code_slides"><a class="anchor" href="#_how_to_code_slides"></a>How to Code Slides</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It’s easiest to understand the essence of slide coding in AsciiDoctor using examples. All of them are from real slides that I made for my conference talks this year.</p>
+</div>
+<div class="paragraph">
+<p>A slide with a title and a list of items that open up successively:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">== Why Streams API?
+
+[%step]
+* Real-time stream processing
+* Stream-like API (map / reduce)
+* Under the hood:
+** Rebalancing
+** Persistent workers' state and replication
+** Easy scaling</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/stepbystep.gif" alt="stepbystep">
+</div>
+</div>
+<div class="paragraph">
+<p>Title and a fragment of source code with highlighted syntax:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">== Kafka Streams API application outline
+
+[source,java]
+----
+StreamsConfig config = ...;
+//Here we set various options
+
+Topology topology = new StreamsBuilder()
+//Here we build the topology
+....build();
+----</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/kafka-streams-slide.png" alt="kafka streams slide">
+</div>
+</div>
+<div class="paragraph">
+<p>Demo code examples are subjected to alterations and improvements in the process of preparing the report, so the opportunity to quickly copy and paste the code from IDE directly into the slide is invaluable, which ensures the relevance of the demo example without worrying about syntax highlighting.</p>
+</div>
+<div class="paragraph">
+<p>Title, illustration, and text (the layout of the slide is made using the AsciiDoctor <a href="https://asciidoctor.org/docs/user-manual/#tables">tables</a>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">== Kafka Streams in Action
+[.custom-style]
+[cols="30a,70a"]
+|===
+|image::KSIA.jpg[]
+|
+* **William Bejeck**, +
+“Kafka Streams in Action”, November 2018
+* Code examples for Kafka 1.x
+|===</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/kstreams-in-action-slide.png" alt="kstreams in action slide">
+</div>
+</div>
+<div class="paragraph">
+<p>Sometimes there is no need for a title, you can simply illustrate your thoughts with a full-screen image:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">[%notitle]
+== Living in Legacy is Hard
+
+image::swampman.jpg[canvas, size=cover]</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/swamp.jpg" alt="swamp">
+</div>
+</div>
+<div class="paragraph">
+<p>Often an idea needs to be supported by a simple diagram, i.e., squares connected by arrows. Fortunately, AsciiDoctor is integrated with Graphviz, a language that allows you to describe graph charts based on node descriptions and the relationships between them. You do need to master Graphviz, but the existing examples make the process easy! Here&#8217;s what it looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">== Coding “Bet Totalling App”
+
+What is the total payout when the certain outcome wins?
+
+[graphviz, "counting-topology.png"]
+-----
+digraph G {
+graph [ dpi = 150 ];
+rankdir="LR";
+node [fontsize=18; shape="circle"; fixedsize="true"; width="1.1"];
+Store [shape="cylinder"; label="Local Store"; fixedsize="true"; width="1.5"]
+Source -&gt; MapVal -&gt; Sum -&gt; Sink
+Sum -&gt; Store [dir=both; label=" \n "]
+{rank = same; Store; Sum;}
+}
+-----</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/bet-totaling-slide.png" alt="bet totaling slide">
+</div>
+</div>
+<div class="paragraph">
+<p>Whenever you need to edit the text within the node, change the arrow’s direction, etc., you can do it directly in the presentation code, instead of redrawing the picture elsewhere and reinserting it into the slide. This approach speeds up the process of working with slides dramatically.</p>
+</div>
+<div class="paragraph">
+<p>Here’s a more complicated example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">== Non-reproducible build
+[graphviz, "unstable-update.png"]
+-----
+digraph G {
+  rankdir="LR";
+  graph [ dpi = 150 ];
+
+  u -&gt; r0;
+  u[shape=plaintext; label="linter update\n+ 13 warnings"]
+  r0[shape=point, width = 0]
+  r1 -&gt; r0[ arrowhead = none, label="master branch" ];
+
+  r0-&gt; r2 [];
+  b1 -&gt; b4;
+
+  r1-&gt;b1
+  r1[label="150\nwarnings"]
+  b1[label="± 0\nwarnings"]
+
+  b4[label="± 0\nwarnings"]
+  b4-&gt;r2
+  r2[label="163\nwarnings", color="red", xlabel=&lt;&lt;font color="red"&gt;merge blocked&lt;/font&gt;&gt;]
+  {rank = same; u; r0; b4;}
+}
+-----</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/non-reproducible-slide.png" alt="non reproducible slide">
+</div>
+</div>
+<div class="paragraph">
+<p>By the way, experimenting with Graphviz and fine-tuning the images can be conveniently done on the <a href="https://dreampuf.github.io/GraphvizOnline">Graphviz online</a> page.</p>
+</div>
+<div class="paragraph">
+<p>Finally, if you want to insert a flowchart, class diagram, or another UML diagram into the slide, then <a href="http://plantuml.com/">PlantUML</a>, another system integrated with AsciiDoctor, may come to the rescue.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">== Intersection types
+
+[plantuml, intersections, png]
+----
+@startuml
+skinparam dpi 150
+class Employee {
+}
+class Retiree {
+}
+class Person {
+  + getName(): String
+}
+interface Payable {
+  + getMonthPayment: BigDecimal
+}
+Payable &lt;|.. Employee
+Payable &lt;|.. Retiree
+Person &lt;|-- Employee
+Person &lt;|-- Retiree
+Person &lt;|-- Visitor
+@enduml
+----
+
+[source,java]
+----
+public &lt;T extends Person &amp; Payable&gt;
+  String getRandomNameAndPayment(List&lt;T&gt; items) {
+  T result =
+    items.get(
+        ThreadLocalRandom.current().nextInt(items.size()));
+    return result.getName() //from Person!
+         + result.getPayment(); //from Payable!
+}
+----</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/intersection-type-slide.png" alt="intersection type slide">
+</div>
+</div>
+<div class="paragraph">
+<p>Transformation of the presentation project into code stored on the version control system allows to work collaboratively on the presentation, separating the tasks of content creation and visual designing between the relevant people. Slide design (fonts, backgrounds, indents) is described in RevealJS using CSS. My personal CSS skills are best conveyed by this GIF</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/css.gif" alt="css">
+</div>
+</div>
+<div class="paragraph">
+<p>&#8230;&#8203;but that’s not a problem when there are people who are much faster and better at dealing with CSS than I am. It turns out that as the presentation deadline rapidly approaches, we can simultaneously work on different files through Git and collaborate at a speed that’s impossible to imagine when sending .pptx files by mail.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_compiling_the_presentation_to_html"><a class="anchor" href="#_compiling_the_presentation_to_html"></a>Compiling the Presentation to HTML</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Plain text sources are great, but how do you compile them into a presentation?</p>
+</div>
+<div class="paragraph">
+<p>AsciiDoctor is a Ruby project, and there are several ways to run it. First, you can install Ruby and run asciidoctor directly, which may probably be the best option for Ruby developers.</p>
+</div>
+<div class="paragraph">
+<p>If you don’t feel like messing with Ruby installation, you can use the <a href="https://github.com/asciidoctor/docker-asciidoctor">asciidoctor/docker-asciidoctor</a> Docker image, to which you can mount the project source folder via VOLUME and get the result in the specified location.</p>
+</div>
+<div class="paragraph">
+<p>The option I had settled on may seem somewhat surprising, but it’s most convenient for me as a Java developer. It doesn’t require Ruby installation or Docker, but does allow one to generate slides using a Maven script.</p>
+</div>
+<div class="paragraph">
+<p>In fact, the <a href="https://www.jruby.org/">JRuby</a> project (the Java implementation of the Ruby language) is so outstanding that it allows you to run almost everything that is created for Ruby in Java machine, and running AsciiDoctor is one of the most common JRuby use cases.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://asciidoctor.org/docs/asciidoctor-maven-plugin/">asciidoctor-maven-plugin</a> allows us to build AsciiDoctor documentation. If you use Maven, AsciiDoctor and JRuby are automatically downloaded, and AsciiDoctor is executed in the JRuby environment: nothing needs to be installed manually! (Except for the <code>graphviz</code> package, which is required when using GraphViz or PlantUML graphics.) Just place your <code>.adoc</code> files in the <code>src/main/asciidoc/</code> folder. Here is an <a href="https://github.com/inponomarev/csa-hb/blob/master/pom.xml">example of a .pom file</a> that builds diagram slides.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_converting_slides_to_pdf"><a class="anchor" href="#_converting_slides_to_pdf"></a>Converting Slides to PDF</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Although the HTML version of the slides is completely self-sufficient (in Reveal JS, you can even open a ‘speaker view’ in a separate browser window with notes, timer and upcoming slide preview), sometimes a PDF version of the slides is also needed. First of all, some conferences that don’t allow the speaker to connect their own laptop, require slides “strictly in pptx or pdf format,” without realizing that they also come in HTML. Secondly, it’s good form to send the organizers a read-only PDF version of your slides as they were shown during your report, to be published in the conference materials.</p>
+</div>
+<div class="paragraph">
+<p>Fortunately, the Node.js <a href="https://github.com/astefanutti/decktape">decktape</a> utility can handle this task perfectly well. It’s built on <a href="https://pptr.dev/">Puppeteer</a>, a Chrome browser automation system. You can convert RevealJS presentation to PDF using the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">node decktape.js -s 3200x1800 --slides 1-500 \
+  reveal "file:///index.html?fragments=true" slides.pdf</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are two tricks, which I discovered via trial and error:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a double margin is required for resolution via the -s parameter, otherwise you may encounter problems with PDF layout,</p>
+</li>
+<li>
+<p>in the URL of the HTML version of the presentation you need to pass the <code>?fragments=true parameter</code>, which will allow you to create a separate PDF page for each transitional state of your slide (for example, five pages for five list items, if they are displayed successively). This will make it possible to use this PDF on its own as a presentation when delivering a report.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_continuous_integration_and_auto_web_publishing"><a class="anchor" href="#_continuous_integration_and_auto_web_publishing"></a>Continuous Integration and Auto Web Publishing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It’s convenient to get slides built automatically each time a change is commited to the version control system. And it’s even more convenient when the automatically compiled slides are posted online for collaborative use. Slides from the Internet can be easily “played” in front of an audience from any machine connected to the Internet and a projector.</p>
+</div>
+<div class="paragraph">
+<p>Since we use GitHub in our work, the natural CI system choice is Github CI, while for hosting ready-made presentations it’s <a href="https://pages.github.com/">github.io</a>. The concept behind github.io is that any static content placed in your GitHub project branch’s <code>gh-pages</code> can be accessed at <code><a href="https://&lt;your" class="bare">https://&lt;your</a> name&gt;.gihub.io/&lt;your project&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>The complete Github CI configuration file, including the Maven-assisted HTML page compilation, and pushing all the results to the <code>gh-pages</code> branch for publication on github.io looks as follows:
+<a href="https://github.com/inponomarev/mocks-talk/blob/master/.github/workflows/maven.yml" class="bare">https://github.com/inponomarev/mocks-talk/blob/master/.github/workflows/maven.yml</a></p>
+</div>
+<div class="paragraph">
+<p>Thus, each commit of the presentation code on GitHub will automatically rebuild the slides in HTML and PDF formats and reload them on github.io. (Of course, the only presentations you should upload to github.io are the ones you want to make public).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_project_examples"><a class="anchor" href="#_project_examples"></a>Project Examples</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Finally, here are the links to a couple of presentation projects with customized Maven scripts and CI configuration for Github, which you can clone and use when creating your own presentation projects:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/inponomarev/kstreams-examples" class="bare">https://github.com/inponomarev/kstreams-examples</a> (my report at JPoint 2019)</p>
+</li>
+<li>
+<p><a href="https://github.com/inponomarev/kafka-hjs" class="bare">https://github.com/inponomarev/kafka-hjs</a> (my report at HolyJS 2020)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
