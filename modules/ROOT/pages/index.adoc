@@ -17,6 +17,8 @@ When talking about JVM languages, I prefer to dive deep in advanced topics, incl
 
 NOTE: xref:javacourse.adoc[Core Java course working materials]
 
+NOTE: xref:talks-portfolio.adoc[Conference talks portfolio]
+
 == Experience in software engineering industry
 
 Currently Staff Software Engineer at https://www.synthesized.io/[Synthesized].
@@ -71,8 +73,6 @@ Program Committe member at the following conferences:
 
 [none]
 * A conference on systems and business analysis.
-
-NOTE: xref:talks-portfolio.adoc[Conference talks portfolio]
 
 
 == Education
