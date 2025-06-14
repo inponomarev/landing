@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Producing Spreadsheet Reports Using Xylophone</h1>
+<div class="paragraph">
+<p>There are tasks in the IT sphere that look totally unattractive against the background of the successes in big data, machine learning, blockchainand other trendy breakthroughs, but have nonetheless remained topical for an entire army of developers over decades. The case at hand is that of the ancient task of forming and downloading spreadsheet (mostly MS Excel) documents, which has been encountered by anyone who has ever written business apps.</p>
+</div>
+<div class="paragraph">
+<p>What are the general options for forming Excel files?</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>VBA-macros. These days the idea of using macros is most often inappropriate for security reasons.</p>
+</li>
+<li>
+<p>Automating Excel by an external program via API. This requires the presence of Excel on the same machine as the program that’s generating Excel reports. This option would have worked in the good old days, clients were mostly fat and were coded as desktop software. This option never was particularly fast or reliable, and it’s hardly an option under the current circumstances.</p>
+</li>
+<li>
+<p>Direct generation of an XML-Excel file. As we know, Excel supports the XML document format, which may potentially be generated/modified by any XML-supporting means. This file may be saved with an .xls extension, even though it isn’t, strictly speaking, an xls-file. Excel opens it with no trouble at all. This approach is rather popular, but let’s note one of its disadvantages – the fact that any solution based on direct editing of the XML-Excel format is a one-time hack that lacks consistency.</p>
+</li>
+<li>
+<p>Finally, generation of Excel files is possible using open source libraries, <a href="https://poi.apache.org/">Apache POI</a> being the best-known one. Apache POI developers have put great effort into the reverse engineering of binary formats for MS Office documents, and have been maintaining and developing this library for many years. The result of this reverse engineering is used in Open Office to implement the option of saving documents in MS Office-compatible formats, among other things.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>I believe that the last of the above-mentioned methods is currently preferable for generating MS Office-compatible documents. On the one hand, it doesn&#8217;t require the installation of any proprietary software on the server, and, on the other hand, it offers a powerful API that allows one to use all of the functional capabilities offered by MS Office.</p>
+</div>
+<div class="paragraph">
+<p>However, there are also disadvantages to using Apache POI directly. The first is that Apache POI is a Java library, and if your app isn’t written in one of the JVM languages, you probably won’t be able to use it. Secondly, it’s a low-level library that works with concepts like ‘cell,’ ‘column,’ ‘font.’ That’s why a straightforwardly coded document generation procedure quickly turns into bloated and barely readable code, which makes no differentiation between data and view models, is hard to change, and is altogether embarrassing. Perfect reason to delegate this task to the least experienced developer – let him poke around with it.</p>
+</div>
+<div class="paragraph">
+<p>But everything can be totally different. The LGPL-licensed, Apache POI-based <a href="https://github.com/CourseOrchestra/xylophone">Xylophone</a> project is founded on the idea with an approximately 15-year history. In the projects I&#8217;d participated in, it was used in combination with a wide range of platforms and languages, and the number of reporting form varieties that have been produced with its assistance in the most diverse projects must be going on thousands. It is a Java project, which can function both as a command prompt utility, and as a library (if your code is written in a JVM language, you can use it as a <a href="https://search.maven.org/search?q=a:xylophone">Maven dependency</a>).</p>
+</div>
+<div class="paragraph">
+<p>Xylophone implements the principle of differentiating data models and their representation. Data should be formed in an XML format (with no need to worry about cells, fonts anddividing lines), while Xylophone will form the results using an Excel template and a descriptor that describes your XML file’s traversal procedure, as shown on the diagram:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/xylophone.png" alt="xylophone" width="60%">
+</div>
+</div>
+<div class="paragraph">
+<p>The document template (xls/xlsx template) looks approximately as follows:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/xylophone-template.png" alt="xylophone template">
+</div>
+</div>
+<div class="paragraph">
+<p>As a rule, a blank template is provided by the client himself. An engaged client will be happy to participate in the creation of a template: starting with selection of an appropriate form and up to the font sizes and the width of dividing lines. The advantage of a template is that small changes can be easily made when the report development has already been completed.</p>
+</div>
+<div class="paragraph">
+<p>When the 'visual design' work has been completed, all that&#8217;s left for the developer to do is to:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a procedure for outputting of the required data in the XML format.</p>
+</li>
+<li>
+<p>Create a descriptor that describes the procedure for your XML file’s traversal and copying template fragments to the resulting report.</p>
+</li>
+<li>
+<p>Ensure the cells’ link to the XML file’s elements via XPath expressions.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Everything is more or less clear with XML output — it&#8217;s sufficient to choose an adequate XML representation of the data required to fill the form. What&#8217;s a descriptor?</p>
+</div>
+<div class="paragraph">
+<p>If there were no recurring elements in the form that we are creating (such as the number of lines in shipping documents, which differs from one to the other), the descriptor would look as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;element name="root"&gt;
+    &lt;output range="A1:Z100"/&gt;
+&lt;/element&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>root</code> here stands for the root element of our XML data file, and the A1:Z100 range is a rectangular range of cells from the template, which will be copied into the results. Meanwhile, as it can be observed in the previous illustration, substitution fields, the values of which are substituted for the data from the XML file, have the format <code>~{Xpath-expression}</code> (tilde, opening brace, XPath expression relative to the current XML context, closing brace).</p>
+</div>
+<div class="paragraph">
+<p>What do we do if recurring elements are required in our report? You can naturally represent them as recurring XML elements, and the descriptor helps to appropriately iterate them. The repetition of elements in the report may have either a vertical direction (for instance, when we insert lines into a packing list), or a horizontal one (when we insert the columns in an analytical report). We can use XML element nesting in order to reflect the repetitive report element nesting of any given degree of depth.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/layout.png" alt="layout" width="60%">
+</div>
+</div>
+<div class="paragraph">
+<p>(Cells that will form the top left corner of a subsequent rectangular fragment that will be joined by the report generator, are marked by red rectangles.)</p>
+</div>
+<div class="paragraph">
+<p>There&#8217;s another possible type of repetitive elements: sheets in an Excel workbook. It is also possible to generate one Excel workbook sheet per XML element.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s examine a slightly more complicated example. For instance, we need to obtain a summary report, as in the example below:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="_images/x-example.png" alt="x example"></span></p>
+</div>
+<div class="paragraph">
+<p>Let the range of years for downloading be selected by the user, that’s why both lines and columns are dynamically generated in this report. XML-representation of the data for such a report may look as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;report&gt;
+  &lt;column year="2016"/&gt;
+  &lt;column year="2017"/&gt;
+  &lt;column year="2018"/&gt;
+  &lt;item name="Item 1"&gt;
+    &lt;year amount="365"/&gt;
+    &lt;year amount="286"/&gt;
+    &lt;year amount="207"/&gt;
+  &lt;/item&gt;
+  &lt;item name="Item 2"&gt;
+    &lt;year amount="95"/&gt;
+    &lt;year amount="606"/&gt;
+    &lt;year amount="840"/&gt;
+  &lt;/item&gt;
+  &lt;item name="Item 3"&gt;
+    &lt;year amount="710"/&gt;
+    &lt;year amount="437"/&gt;
+    &lt;year amount="100"/&gt;
+  &lt;/item&gt;
+  &lt;totals&gt;
+    &lt;year amount="1170"/&gt;
+    &lt;year amount="1329"/&gt;
+    &lt;year amount="1147"/&gt;
+  &lt;/totals&gt;
+&lt;/report&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We are free to select tag names to our taste, the structure may also be arbitrary, with regard for the ease of conversion into a report. For example, I usually put the values that are output to a sheet down as attributes, because it simplifies XPath expressions (it’s convenient when they have the <code>@attributename</code> form).</p>
+</div>
+<div class="paragraph">
+<p>A template for such a report will look as follows (compare the XPath expressions with the name of the attributes of corresponding tags):</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/x-template.png" alt="x template">
+</div>
+</div>
+<div class="paragraph">
+<p>Now&#8217;s the time for the most interesting part: creating a descriptor. Since it is an almost completely dynamically generated report, the descriptor is rather complicated, in reality (when all we have is the document’s header, its lines and the footer), everything is much simpler. Here is the descriptor required in this case:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;element name="report"&gt;
+  &lt;!-- Create a worksheet --&gt;
+  &lt;output worksheet="Report" sourcesheet="Sheet1"/&gt;
+  &lt;!-- Column headers in left-to-right direction --&gt;
+  &lt;iteration mode="horizontal"&gt;
+    &lt;element name="(before)"&gt;
+      &lt;!-- Empty cell in top left corner of the table --&gt;
+      &lt;output range="A1"/&gt;
+    &lt;/element&gt;
+    &lt;element name="column"&gt;
+       &lt;output range="B1"/&gt;
+    &lt;/element&gt;
+  &lt;/iteration&gt;
+  &lt;!-- Rows output: top-to-bottom direction--&gt;
+  &lt;iteration mode="vertical"&gt;
+    &lt;element name="item"&gt;
+      &lt;!-- Left-to-right inside the row --&gt;
+      &lt;iteration mode="horizontal"&gt;
+        &lt;element name="(before)"&gt;
+          &lt;!-- Row header --&gt;
+          &lt;output range="A2"/&gt;
+        &lt;/element&gt;
+        &lt;!-- After the header, row data in left-to-right direction --&gt;
+        &lt;element name="year"&gt;
+          &lt;output range="B2"/&gt;
+        &lt;/element&gt;
+      &lt;/iteration&gt;
+    &lt;/element&gt;
+  &lt;/iteration&gt;
+  &lt;iteration&gt;
+    &lt;element name="totals"&gt;
+      &lt;iteration mode="horizontal"&gt;
+        &lt;element name="(before)"&gt;
+          &lt;!-- Row header --&gt;
+          &lt;output range="A3"/&gt;
+        &lt;/element&gt;
+        &lt;!-- After the header, row data in left-to-right direction --&gt;
+        &lt;element name="year"&gt;
+          &lt;output range="B3"/&gt;
+        &lt;/element&gt;
+      &lt;/iteration&gt;
+    &lt;/element&gt;
+  &lt;/iteration&gt;
+&lt;/element&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The descriptor&#8217;s elements are described in their entirety in the <a href="https://courseorchestra.github.io/xylophone/">documentation</a>. To make it short, the descriptor&#8217;s main elements have the following meanings:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>element</code> — transition to the XML file element reading mode. May either be a descriptor root element, or be inside an <code>iteration</code> element. Various element filters may be set up using the <code>name</code> attribute, such as:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name="foo"</code> — elements with the foo tag name.</p>
+</li>
+<li>
+<p><code>name="*"</code> — all elements.</p>
+</li>
+<li>
+<p><code>name="tagname[@]"</code> — elements with a specific name and attribute value.</p>
+</li>
+<li>
+<p><code>name="(before)"</code>, <code>name="(after)"</code> — “virtual” elements that precede an iteration and conclude an iteration.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>iteration</code> — transition to the iteration mode. May only be located within an <code>element</code>. Different parameters may be set, for instance.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mode="horizontal"</code> — horizontal output mode (vertical be default).</p>
+</li>
+<li>
+<p><code>index=0</code> — restrict the iteration exclusively to the first encountered element.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>output</code> — transition to output mode. Main attributes are as follows:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>sourcesheet</code> — a sheet of the template book that is the source of output range. If it&#8217;s not defined, the current (last used) sheet is used.</p>
+</li>
+<li>
+<p><code>range</code> – template range that&#8217;s copied into the resulting document, i.e. “A1:M10”, or “5:6”, or “C:C”. (Using line ranges of the “5:6” type in the horizontal mode, or column ranges of the “C:C” type in the vertical mode will lead to error).</p>
+</li>
+<li>
+<p><code>sheet</code> – if it&#8217;s defined, a new sheet is created in the output file, and output position is shifted to the A1 cell of this sheet. The value of this attribute, equal to the constant or the XPath expression, is substituted in the name of the new sheet.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Actually, there are far more different options in the descriptor, please refer to the <a href="https://courseorchestra.github.io/xylophone/">documentation</a>.</p>
+</div>
+<div class="paragraph">
+<p>Well, it&#8217;s time to download Xylophone and start forming the report. Get the archive from <a href="https://repo1.maven.org/maven2/ru/curs/xylophone/6.1.74/xylophone-6.1.74-bin.zip">Maven Central</a> (NB – there may be later versions available as you’re reading this article). There’s a shell script in the <code>/bin</code> folder, and if you launch it without parameters, you’ll see a hint on command prompt parameters. In order to achieve a result, you need to feed all the prepared ingredients to xylophone:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">xylophone -data testdata.xml -template template.xlsx -descr descriptor.xml -out report.xlsx</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s open the report.xlsx file and make sure that we have got precisely what we need:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/x-result.png" alt="x result">
+</div>
+</div>
+<div class="paragraph">
+<p>Since the <code>ru.curs:xylophone</code> library is available in Maven Central under the LGPL license, it can used seamlessly in programs written in any JVM language. The Groovy language provides the most compact case study, the code is self-explanatory:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Grab('ru.curs:xylophone:6.1.10')
+import ru.curs.xylophone.XML2Spreadsheet
+baseDir = '.'
+new File(baseDir, 'testdata.xml').withInputStream {
+    input -&gt;
+        new File(baseDir, 'report.xlsx').withOutputStream {
+            output -&gt;
+                XML2Spreadsheet.process(input,
+                        new File(baseDir, 'descriptor.xml'),
+                        new File(baseDir, 'template.xlsx'),
+                        false, output)
+        }
+}
+println 'Done.'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>XML2Spreadsheet</code> class has several overloaded versions of the <code>process</code> static method, but all of them come down to the transfer of the very same ‘ingredients’ required to form a report.</p>
+</div>
+<div class="paragraph">
+<p>An important option that I haven’t mentioned yet is the opportunity to choose between the DOM and SAX parsers at the stage of parsing a file with XML data. As we know, the DOM parser uploads the entire file to memory, constructs its objective representation and allows you to traverse its contents in a random manner (including the repeated return to the same element). The SAX parser never places the entire file in memory, instead, it processes it as a ‘stream’ of elements, without the option of returning to the same element.</p>
+</div>
+<div class="paragraph">
+<p>Using the SAX mode in Xylophone (via the command prompt option <code>–sax</code>, or by setting the value of the <code>useSax</code> parameter of <code>XML2Spreadsheet.process(..)</code> method to <code>true</code>) may prove crucially useful in cases when very large files need to be generated. Due to the speed and cost efficiency of SAX parsing the file generation speed increase several-fold. This comes at a price of small restrictions on the descriptor (described in the documentation), but in the majority of cases the reports satisfy these requirements, which is why I’d recommend you use the SAX-mode anywhere you can.</p>
+</div>
+<div class="paragraph">
+<p>I hope that you&#8217;ll like this way of uploading data to Excel via Xylophone, and it will save you time and some nerve cells – as it did for us.</p>
+</div>
+<div class="paragraph">
+<p>And finally some links for the road:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>source code: <a href="https://github.com/CourseOrchestra/xylophone">github.com/CourseOrchestra/xylophone</a></p>
+</li>
+<li>
+<p>documentation: <a href="https://courseorchestra.github.io/xylophone">courseorchestra.github.io/xylophone</a></p>
+</li>
+</ul>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
