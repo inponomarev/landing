@@ -11,7 +11,7 @@ jobs:
     environment: github-pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - run: |
            docker run --rm -v $PWD:/documents/ curs/asciidoctor-od a-od cv.adoc pdf template.fodt
@@ -21,9 +21,9 @@ jobs:
            git commit -m "temp update" --allow-empty
         working-directory: modules/ROOT/attachments
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
           cache: 'npm'
       
       - run: npm i

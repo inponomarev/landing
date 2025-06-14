@@ -13,7 +13,7 @@ This is a list of my conference talks  grouped by years and topics. Most of the 
 |===
 a|
 
-* Description of JPoint 2024 version: https://jugspeakers.info/information/talks/talk/5466[jugspeakers.info/information/talks/talk/5466]
+* Description and video of JPoint 2024 version: https://jugspeakers.info/en/information/talks/talk/5466[jugspeakers.info/en/information/talks/talk/5466]
 * Slides in English (Brighton Kotlin Meetup): https://inponomarev.github.io/dsl-talk/slides[https://inponomarev.github.io/dsl-talk/slides]
 * Slides in Russian (JPoint 2024): https://inponomarev.github.io/dsl-talk/slides-jpoint[inponomarev.github.io/dsl-talk/slides-jpoint]
 
@@ -69,7 +69,7 @@ image::tallinn2023-2.jpg[fitrect="{fitrect}"]
 [{cols},{grid}]
 |===
 a|
-* Description and video of Heisenbug 2022 version (in Russian): https://jugspeakers.info/information/talks/talk/3711[jugspeakers.info/information/talks/talk/3711]
+* Description and video of Heisenbug 2022 version (in Russian): https://jugspeakers.info/en/information/talks/talk/3711[jugspeakers.info/en/information/talks/talk/3711]
 * Video of Devoxx UK 2024 version (in English): https://youtu.be/aVDDfN8pwpM[youtu.be/aVDDfN8pwpM]
 * Slides in Russian: https://inponomarev.github.io/mocks-talk[inponomarev.github.io/mocks-talk]
 * Slides in English:
@@ -92,7 +92,7 @@ image::jpoint2022.jpg[fitrect="{fitrect}"]
 [{cols},{grid}]
 |===
 a|
-* Description of Joker 2022 version: https://jugspeakers.info/information/talks/talk/4235[jugspeakers.info/information/talks/talk/4235]
+* Description of Joker 2022 version: https://jugspeakers.info/en/information/talks/talk/4235[jugspeakers.info/en/information/talks/talk/4235]
 * Blog post in English: https://dzone.com/articles/type-variance-in-java-and-kotlin[dzone.com/articles/type-variance-in-java-and-kotlin]
 * Slides in English: https://inponomarev.github.io/variance-lecture/[inponomarev.github.io/variance-lecture]
 
@@ -114,7 +114,7 @@ image::joker2022.jpg[fitrect="{fitrect}"]
 |===
 
 a|
-* Description and video of the SnowOne 2021 version: https://jugspeakers.info/information/talks/talk/2895[jugspeakers.info/information/talks/talk/2895]
+* Description and video of the SnowOne 2021 version: https://jugspeakers.info/en/information/talks/talk/2895[jugspeakers.info/en/information/talks/talk/2895]
 
 * Blog post in English: dzone.com/articles/what-can-we-learn-from-java-data-structures-visual, xref:blog:ljv.adoc[archived version]
 
@@ -127,6 +127,8 @@ a|
 * **26.02.2021 SnowOne 2021, online.** Java conference from Novisibirsk https://snowone.ru/en
 
 * 26.08.2021 DevClub local meetup, Tallinn https://devclub.eu, https://youtu.be/Nu01peDzntg.
+
+* 07.11.2024 JFall 2024: https://youtu.be/_NkFVSqL61g
 
 a|
 image::snowone2021.jpg[fitrect="{fitrect}"]
@@ -141,7 +143,7 @@ image::tallinn2021.jpg[fitrect="{fitrect}"]
 |===
 
 a|
-* Description and video of the HolyJS 2020 talk: https://jugspeakers.info/information/talks/talk/1420[jugspeakers.info/information/talks/talk/1420]
+* Description and video of the HolyJS 2020 talk: https://jugspeakers.info/en/information/talks/talk/1420[jugspeakers.info/en/information/talks/talk/1420]
 
 * Slides in English: https://inponomarev.github.io/kafka-hjs/index-en.html[inponomarev.github.io/kafka-hjs/index-en.html]
 
@@ -160,7 +162,7 @@ image::holyjs2020.jpg[fitrect="{fitrect}"]
 a|
 In collaboration with John Roesler (https://www.linkedin.com/in/john-roesler-6280755/[linkedin.com/in/john-roesler-6280755]).
 
-* Description and video of the Joker 2020 talk: https://jugspeakers.info/information/talks/talk/2714[jugspeakers.info/information/talks/talk/2714]
+* Description and video of the Joker 2020 talk: https://jugspeakers.info/en/information/talks/talk/2714[jugspeakers.info/en/information/talks/talk/2714]
 
 * Slides in English: https://inponomarev.github.io/kstreams-testing-pitfalls/[inponomarev.github.io/kstreams-testing-pitfalls]
 
@@ -185,7 +187,7 @@ image:joker2020.jpg[fitrect="{fitrect}"]
 |===
 a|
 
-* Description and video of JPoint 2019 version: https://jugspeakers.info/information/talks/talk/66[jugspeakers.info/information/talks/talk/66]
+* Description and video of JPoint 2019 version: https://jugspeakers.info/en/information/talks/talk/66[jugspeakers.info/en/information/talks/talk/66]
 * Slides, part 1: https://inponomarev.github.io/kstreams-examples/lecture01/index-en.html[inponomarev.github.io/kstreams-examples/lecture01/index-en.html], 
 * Slides, part 2: https://inponomarev.github.io/kstreams-examples/lecture02/index-en.html[inponomarev.github.io/kstreams-examples/lecture02/index-en.html]
 
@@ -194,7 +196,7 @@ a|
 
 * **06.04.2019 JPoint 2019, Moscow (more than 1000 participants)** https://2019.jpoint.ru/en/[2019.jpoint.ru/en] 
 * 16.02.2019 PermDevDay 2019, Perm https://permdevday.timepad.ru/event/891016/[permdevday.timepad.ru/event/891016]
-* 25.07.2019 JugMSK #40 local meetup, Moscow https://jugspeakers.info/information/events/event/189[jugspeakers.info/information/events/event/189]
+* 25.07.2019 JugMSK #40 local meetup, Moscow https://jugspeakers.info/en/information/events/event/189[jugspeakers.info/en/information/events/event/189]
 * 12.10.2019 Stachka Innopolis 2019, Kazan http://web.archive.org/web/20200819012445/https://nastachku.ru/archive/2019_innopolis/index.php[web.archive.org/web/20200819012445/https://nastachku.ru/archive/2019_innopolis/index.php]
 
 a|
@@ -207,7 +209,7 @@ image::jpoint2019.jpg[fitrect="{fitrect}"]
 [{cols},{grid}]
 |===
 a|
-* Description and video of Heisenbug 2019 version: https://jugspeakers.info/information/talks/talk/1235[jugspeakers.info/information/talks/talk/1235]
+* Description and video of Heisenbug 2019 version: https://jugspeakers.info/en/information/talks/talk/1235[jugspeakers.info/en/information/talks/talk/1235]
 * Blog post in English: https://habr.com/post/440610/[habr.com/post/440610] 
 * Blog post in Russian: https://habr.com/post/436868/[habr.com/post/436868]
 
@@ -228,7 +230,7 @@ image::devopsforum2019.jpg[fitrect="{fitrect}"]
 [{cols}, frame=none, grid=none]
 |===
 a|
-* Description and video of the DevOops 2018 version: https://jugspeakers.info/information/talks/talk/997[jugspeakers.info/information/talks/talk/997]
+* Description and video of the DevOops 2018 version: https://jugspeakers.info/en/information/talks/talk/997[jugspeakers.info/en/information/talks/talk/997]
 
 * Transcript of the DevOops version (in Russian): https://habr.com/post/488966/[habr.com/post/488966]
 
@@ -250,7 +252,7 @@ image:devopsmsk2018.jpg[fitrect="{fitrect}"]
 
 [{cols}, frame=none, grid=none]
 |===
-a|* Description and video of JPoint2017 version: https://jugspeakers.info/information/talks/talk/446[jugspeakers.info/information/talks/talk/446]
+a|* Description and video of JPoint2017 version: https://jugspeakers.info/en/information/talks/talk/446[jugspeakers.info/en/information/talks/talk/446]
 
 * Blog post in English: dzone.com/articles/hidden-complexity-of-a-routine-task-presenting-tab, xref:blog:grid.adoc[archived version]
 * Blog post in Russian, extended version: 
@@ -261,7 +263,7 @@ a|* Description and video of JPoint2017 version: https://jugspeakers.info/inform
 .Presented at:
 
 * **08.04.2017 JPoint 2017, Moscow** (major international Java conference, **over 1000 participants**) https://2017.jpoint.ru/en/[2017.jpoint.ru/en/]
-* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/information/events/event/122[jugspeakers.info/information/events/event/122]
+* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/en/information/events/event/122[jugspeakers.info/en/information/events/event/122]
 a|image::jpoint2017.jpg[fitrect="{fitrect}"]
 |===
 
@@ -271,13 +273,13 @@ a|image::jpoint2017.jpg[fitrect="{fitrect}"]
 [{cols}, frame=none, grid=none]
 |===
 a|
-* Description and video: https://jugspeakers.info/information/talks/talk/1950[jugspeakers.info/information/talks/talk/1950]
+* Description and video: https://jugspeakers.info/en/information/talks/talk/1950[jugspeakers.info/en/information/talks/talk/1950]
 * Blog post in English: dzone.com/articles/celesta-sql-databases-api-schema-migration-and-tes, xref:blog:celesta.adoc[archived version]
 * Blog post in Russian (updated version): https://habr.com/post/455746/[habr.com/post/455746]
 
 .Presented at:
 
-* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/information/events/event/122[jugspeakers.info/information/events/event/122]
+* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/en/information/events/event/122[jugspeakers.info/en/information/events/event/122]
 * **16.03.2018 SECON 2018, Penza (1400 attendees)**: https://2018.secon.ru/reports/celesta-sozdanie-biznes-logiki-v-java-ekosisteme[2018.secon.ru/reports/celesta-sozdanie-biznes-logiki-v-java-ekosisteme]
 a|image::jug2017.jpg[fitrect="{fitrect}"]
 image::secon2018.jpg[fitrect="{fitrect}"]
