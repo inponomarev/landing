@@ -196,7 +196,7 @@ a|
 
 * **06.04.2019 JPoint 2019, Moscow (more than 1000 participants)** https://2019.jpoint.ru/en/[2019.jpoint.ru/en] 
 * 16.02.2019 PermDevDay 2019, Perm https://permdevday.timepad.ru/event/891016/[permdevday.timepad.ru/event/891016]
-* 25.07.2019 JugMSK #40 local meetup, Moscow https://jugspeakers.info/en/information/events/event/189[jugspeakers.info/en/information/events/event/189]
+* 25.07.2019 JugMSK #40 local meetup, Moscow https://jugspeakers.info/en/information/events/event/186[jugspeakers.info/en/information/events/event/186]
 * 12.10.2019 Stachka Innopolis 2019, Kazan http://web.archive.org/web/20200819012445/https://nastachku.ru/archive/2019_innopolis/index.php[web.archive.org/web/20200819012445/https://nastachku.ru/archive/2019_innopolis/index.php]
 
 a|
@@ -263,7 +263,7 @@ a|* Description and video of JPoint2017 version: https://jugspeakers.info/en/inf
 .Presented at:
 
 * **08.04.2017 JPoint 2017, Moscow** (major international Java conference, **over 1000 participants**) https://2017.jpoint.ru/en/[2017.jpoint.ru/en/]
-* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/en/information/events/event/122[jugspeakers.info/en/information/events/event/122]
+* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/en/information/events/event/119[jugspeakers.info/en/information/events/event/119]
 a|image::jpoint2017.jpg[fitrect="{fitrect}"]
 |===
 
@@ -279,7 +279,7 @@ a|
 
 .Presented at:
 
-* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/en/information/events/event/122[jugspeakers.info/en/information/events/event/122]
+* 21.09.2017 JugMSK #25 local meetup, Moscow: https://jugspeakers.info/en/information/events/event/119[jugspeakers.info/en/information/events/event/119]
 * **16.03.2018 SECON 2018, Penza (1400 attendees)**: https://2018.secon.ru/reports/celesta-sozdanie-biznes-logiki-v-java-ekosisteme[2018.secon.ru/reports/celesta-sozdanie-biznes-logiki-v-java-ekosisteme]
 a|image::jug2017.jpg[fitrect="{fitrect}"]
 image::secon2018.jpg[fitrect="{fitrect}"]
