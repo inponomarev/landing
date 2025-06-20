@@ -20,7 +20,7 @@ a|
 .Presented at:
 
 * 16.01.2024 Brighton Kotlin Meetup Brighton, UK (in English) https://youtu.be/2SMPrTV6OVw[youtu.be/2SMPrTV6OVw]
-* **24.04.2024 JPoint 2024** (in Russian)
+* **24.04.2024 JPoint 2024 https://youtu.be/3EwPWmXMKzs[youtu.be/3EwPWmXMKzs]** (in Russian)
 
 a|
 image::brighton2024.jpg[fitrect="{fitrect}"]
@@ -52,7 +52,7 @@ image::tallinn2023-1.jpg[fitrect="{fitrect}"]
 |===
 a|
 
-* Slides in Russian: https://inponomarev.github.io/celesta2023[inponomarev.github.io/celesta2023]
+* Slides in Russian: https://inponomarev.github.io/celesta2025[inponomarev.github.io/celesta2025]
 
 .Presented at:
 
