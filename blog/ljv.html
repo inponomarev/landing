@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">LJV: What We Can Learn From Java Data Structures Visualization</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>When I started to prepare a course of lectures on the Java language for the Moscow Institute of Physics and Technology, I became to search for material that can be used as illustrations. ‘One picture is worth a thousand words’ as they say, and sometimes it’s worth even more because it seems impossible to explain e. g. how a hash table works without drawing something. My task was to explain to students many Java concepts, from string pool to advanced data structures. I was looking for a solution that is able to make the visualization of Java data structures in the easiest and precise way, ideally compatible with <a href="presentation.html" class="xref page">‘presentation as code’</a>  technology.</p>
+</div>
+<div class="paragraph">
+<p>There exists Aleksey Shipilev’s <a href="https://github.com/openjdk/jol">JOL</a> (Java Object Layout) tool known among Java performance engineers. JOL analyzes the memory layout for any given object, including all the auxiliary data and fields, and the graph of objects reachable from the given instance. This tool gives accurate estimations of the object size and also shows the addresses in memory where objects are located. However, it’s not yet able to visualize the object graph and gives too many low-level details that are irrelevant for the students who just started to learn Java.</p>
+</div>
+<div class="paragraph">
+<p>While surfing the web looking for something that better fits my needs, I came across a <a href="https://www.cs.auckland.ac.nz/~j-hamer/LJV.html">page</a> on the University of Auckland’s website dedicated to the GPL-licensed program called LJV (Lightweight Java Visualizer). This tool was developed by <a href="https://www.gla.ac.uk/schools/computing/staff/?webapp=staffcontact&amp;action=person&amp;id=4cdcebe68a94">Dr. John Hamer</a> in Java version 1.4 in 2004, which is the year when Maven 1.0 was released, and four years before GitHub appeared. Although it hadn’t been developed since then, it still worked perfectly and was able to run at least on Java 8 and do its job! I used LJV extensively while preparing the slides for my lectures, and in the fall of 2020 two of my students, Ilya Selivanov and Nuras Nogaev updated the code to Java 11, added tests, CI, documentation, a couple of new features, and published it on <a href="https://github.com/atp-mipt/ljv">GitHub</a> and <a href="https://search.maven.org/artifact/org.atp-fivt/ljv">Maven Central</a> as a part of their semester project. Here I would like to briefly explain the LJV working principle and show some examples of its usage.</p>
+</div>
+<div class="paragraph">
+<p>The idea behind LJV is very simple. It takes an arbitrary object and then uses Java Reflection API to traverse the graph of objects reachable from a given one. It forms a representation of the graph in <a href="https://graphviz.org/doc/info/lang.html">DOT language</a>  that can be later converted into <code>png</code> or <code>svg</code> image using  <a href="https://graphviz.org/">Graphviz</a> software. Actually we even need not to have graphviz installed: <a href="https://dreampuf.github.io/GraphvizOnline/">GraphvizOnline</a> can render an image in a browser.</p>
+</div>
+<div class="paragraph">
+<p>Thus, this one-liner</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">System.out.println(new LJV().drawGraph("Hello"));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>gives us the following in the console:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">digraph Java {
+    rankdir="TB";
+    node[shape=plaintext]
+    . . .
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In order to convert this to an image one might use</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">dot -Tpng myfile.dot &gt; myfile.png</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or, even simpler, just paste the resulting script to <a href="https://dreampuf.github.io/GraphvizOnline/">GraphViz Online</a> and get a picture:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtjzFvg0AMhWf4FScWlkZwZGiVcjdk7NpuEYPhHDj1dCBzSatW_e8xpI2iqBJLJtvP35OfjW0Jhk68wBHEdxwR-HdjSSVv2-Q5jnxvcDd2MKAaHFgf8DNULMudgxqdKuMoKgPUDkXdk0FSaZ6KBp37G-V5HAdorG-ntWYPm2iu3BhB_QfvvUrXqX4NxFyZBXPmsl_w2qAbjkUbkS9gHYzdfxTXKTK3upqeLO75jX4sLgfnWebyVnhaEqRcDC3FSotL9OQI7oDJw773YbRfqGTB1M8JsmGAQw==" alt="Diagram">
+</div>
+</div>
+<div class="paragraph">
+<p>By calling configuration methods on the <code>LJV</code> object we can customize the way it visualizes data. We can choose fonts and colors for classes and fields, whether to hide null-valued fields, which objects should be represented only by their <code>toString</code> method invocation result, diagram drawing direction (top-to-bottom or left-to-right), etc., etc.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String graph = new LJV()
+    .addFieldAttribute("left", "color=red,fontcolor=red")
+    .addFieldAttribute("right", "color=blue,fontcolor=blue")
+    .addClassAttribute(Node.class, "color=pink,style=filled")
+    .addIgnoreField("ok")
+    .setTreatAsPrimitive(String.class)
+    .setShowFieldNamesInLabels(false)
+    .drawGraph(n1);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNq1UT1vgzAUnOFXWCwsVCnQrdhS0i1Dp25RBoMfYOXJRg8n_VL_ew1JI6pWSoSU6X3cnfzurHRDsmvZWh4k-wwDkmanNPHoZRU9hoGxCjZ9KzvgHUptHLy5rV-nG5QlIC_CICicLBFYaUkB8fg-ZhUg_ozpcew7WWnTDLDwGi-isfpGMbKvHjc8zmLx7F8sFk4dWYsTbUoXyz-4r8MNvhVJZdES77TZJb17R-C1RgS1Hdxktzn7IRZLY10LdMX1qwu42SPOoUwyGL2m7E6ws-MIoXZRUlvjev0BPM1OQRGocXueRnF-s_-9Pqinixbz0WI60-JvMemm_Vdd4h4m8mGc5JvP1H99A-TcA3k=" alt="Diagram">
+</div>
+</div>
+<div class="paragraph">
+<p>The things that we see as a result of the visualization are, in my opinion, interesting and instructive not only for Java beginners but also for all the practicing Java engineers, even those who already know about the effects shown.</p>
+</div>
+<div class="paragraph">
+<p>Let’s see some examples.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_string"><a class="anchor" href="#_string"></a>String</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The most widely used type of data in Java is, of course, <code>String</code>. Starting from Java 9, the internal representation of <code>String</code> has changed: <code>char[]</code> was replaced by <code>byte[]</code>, and coder flag was introduced in order to switch between 8-bit and 16-bit character representation. This allowed significant memory optimization for strings that contain only LATIN-1 charset characters:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/*Java 8-: one 16-bit char per character*/
+new LJV().drawGraph("abcαβγ");</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNq9UD1vwjAQ3fkVVgZYQBBGiD0wdm23iOEcH7GFcSzHRBWI_46NaQFBUKfe9r5O906o2oGV5AM6IMcBCePAbIVyNPtaZcsLYxqBZSvBIrUalPH47ddJyUsNHDUtLjBO4YFrJLxxAh0dzUakQq1_YJ5ga6FSpo4y-02mtHskEilI1cSQiRvYp3chXEy9eOllElq5ILNnQ2Du1gcUT00EW1-7zv-pEYP-ArxfqvqlIWgrYfnGwNG_1WvY7V4Z_vK3nEzY7XtZB3qP2XjTGN-qA9J8HoynM-Qql7k=" alt="Diagram">
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/*Java 9+: coder set to 0 and one byte per LATIN-1 character*/
+new LJV().drawGraph("abc");</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtjzFvwkAMhefkV5yyZCmChKHQ5m5gZC0bYnByJjlxukTOkVZF_HccAgghJBYm-9nfk5-1KQmaSiyhA3EIAwK304ZktFpE32Hgao3rtoIGZWPBOI9_fsPjZG0hRyuzMAgyD7lFkdekkWQ8iUWB1l5lMsi2gcK4sl8r9rCJzpUbLaj-5b2T8TRWP56Yy8ZeD9z4At4bVMGx6EtMXmAVtNUzimsfmVu16Z9M3_mNmn_eDg569qDnLwMlYqTELVbUgd1j9LGtnW_NP8okZep4AtsNeNQ=" alt="Diagram">
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/*Java 9+: coder set to 1
+and 2 bytes per character
+if there are symbols outside
+LATIN-1 set*/
+new LJV().drawGraph("abcαβγ");</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtkDFvwjAQhefkV5yyZCkihiGExh46doUNMVxiQ6xaTnRxaQXqf-8FWtRSAUunu-fvPfnutN0Sdg084w7hEEeE_kVbksnyKXmMI99qs-ob7IzsHFofzHtY87NYOayMk2UcRWXAyhmoWtKGZJqlUBvnvqU4yb7D2vrtgBVnOETHyo0Gat-Ye5lOU7UIxL5yHPTJN_4y_gyomseiOYg7tgb7Zg7ZHxfXYWRu1XpYcvKf26giP3941NlvWcxu4-ImHuUXfHrJZ3d4fo1fu46AkYLzjZIduleTPGxaH3q7N1JM2PXxCVuPlts=" alt="Diagram">
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_string_creation"><a class="anchor" href="#_string_creation"></a>String creation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One rarely needs to create <code>String</code> using <code>new</code> operator, however it&#8217;s worth noticing that <code>String(String original)</code> constructor reuses the internal byte array of its argument.
+Concatenation (even with an empty string!) always produces a full new copy:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String x = "Hello";
+new LJV().drawGraph(new String[]{
+    x, new String(x),
+    new String(x.toCharArray()),
+    x + ""});</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrdk0FPgzAYhs_wK5peuGhsYRs4aQ8evept2aHQMohNIaVOo_G_23VhcasLJnoZp359-1K-93uANxvNuho8sC0DH2GgmXrmjSbw6R7ehYFquVj1NesE6SRrlBFvZm1lvJKsEJLkYRDkhhVSgKLVXGgSoQiUQsphi_fbvmNlozaH445x7va3EbV32Eu0W23BQddqQ2CFIM1vDPd0fEaPz-jJN90W7kV23XVtS7re5Yz_EMgPoNtXe65IlET00Wjr8xo4eoCWds56CdCIrWZ9_ZPrNE3yn2loGh-NlWKET4VsTMB4HAG4puDQOtwy-SLgVdUq0zfvguDYufCyQs44EIPIN80mRXP228FgZxzCQ-yb5pMazOISP_O5g7QYp7n_HwZiMPZN6aRoZpdIM3WQsnGaiTMOxGByavoMvwCejwAk" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_string_interning"><a class="anchor" href="#_string_interning"></a>String interning</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Calling <code>intern()</code> deduplicates all the <code>String</code> objects and reduce them to a single value kept in the <code>String</code> pool (compare with the previous example):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String x = "Hello";
+new LJV().drawGraph(new String[]{
+  x, new String(x).intern(),
+  new String(x.toCharArray()).intern(),
+  (x + "").intern()}));</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtkbFOwzAQhufkKSwvWUD4nAEosQdGVtiqDpfYaSIsx3JMQSDeHTeoFUlTZSiT7_77fL7_rNqtR9eQJ9wh-UoTj_ZVtV7Ql0f6kCa2U3rdN-i0cAZbG_RH2EQZ1gZLbUSRJkkRsDSalJ1X2ouMZaTSxhxS-E17h1Vrt8eyQ6WG_D6TsUds4oczBoq4zgdBa0ZlcRPUiQ5ndH5Gz__oMRgeiud-6hjKzd4nv8DQqQHfvce6FVmeyefgI3cywOiCrOKe_YqwBazBvpmjpm7y_3Qjb_lorRIYTIW7JQFg-QvItSTH0ekOzZumV3VnQ99-agF8oGBVswE8_BhlsxCMIZiF-Bjis1A-hvIp9P0DIzjjKg==" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_boxed_primitives_caching"><a class="anchor" href="#_boxed_primitives_caching"></a>Boxed primitives caching</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Usually we create boxed primitives via autoboxing. In rare cases when we do need to create e. g. <code>Integer</code> object explicitly, the correct way to do this is with <code>Integer.valueOf</code> method. This method deduplicates values in the range from -128 to 127 or <code>-XX:AutoBoxCacheMax</code> value.</p>
+</div>
+<div class="paragraph">
+<p>Values outside this range will not be deduplicated even when autoboxing is used.</p>
+</div>
+<div class="paragraph">
+<p><code>Integer</code> created with constructor will never be deduplicated, and this constructor is deprecated since Java 9.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">new LJV().drawGraph(new Integer[]{
+    42, Integer.valueOf(42),
+    new Integer(42),
+    -4242, -4242
+});</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrVkDFPwzAQhefkV1heslARO2agxB7YYO5WdbjUThphOZZjCqLiv-MapaJYEUgsdLp3786n91n2nQO7Q4-wB3TIMwfmSfaO49U9vsszM0i1HndgFbcaeuPVq98Em6w1NErzOs-y2kOjFWoGJ5XjRVmgrdJ6aslnO1rY9qY7jS1IGfvbQoQb4YiLNQiJ7OA8x22JRX3tZeKTGZ_O-NWMz774QcQAoR5pghSbIz_9A2gK5oaXMDe8oIV4CJ_ZKZckOHsh9qCf1RIx-mNSsmxLtBDoFBmX-KodjB_7N8UJnZbI-RJJl6pLYqYRZ4qMaYrD_gfOgtHfEVWRaEqNq5To5sKIWCSaUmP2nej9A9hoPbg=" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_linkedlist"><a class="anchor" href="#_linkedlist"></a>LinkedList</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Linked list is a data structure with theoretical O(1) efficiency for adding/removing its random node that can acts both as <code>List</code> and <code>Deque</code>. In Java practice, however, <code>LinkedList</code> is superceded by <code>ArrayList</code> and <code>ArrayDeque</code> in all the cases, and it&#8217;s <a href="https://twitter.com/joshbloch/status/583813919019573248">questionable</a> whether this class is needed in standard library at all.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">List&lt;Integer&gt; list = new LinkedList&lt;&gt;();
+list.add(1); list.add(42); list.add(21);
+
+new LJV()
+  .setTreatAsPrimitive(Integer.class)
+  .setDirection(Direction.LR)
+  .drawGraph(list);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrFUsFuwjAMPbdfEeXSyyZo2lPX5ANQtcOuiINLDERkaZRmbNq0f19CBxpirFzQTrbjZ-f52VKtHdgNmcEOyEeaODBbqRynzRN9SBPTSZz3G7DIrQZlPL75RXjO5xpa1LxOk6T20GokbeckOp5NM7JErQ9hPoS9haUy65gWoSYUub0NjiSuew15wzOWiUaZLcpG9b6eeDlgJ9_gn0WiV-9YkeIMFWzkE1yxiBOw21AtMvEYxBkhqTw-VyQfQVmHu4qYF61HpyluJvzV05RslGX5_5qzMdFNOOUrRS_JvSBH6WlcF71bdcbHG-Q5GzazBx0mp7H9JRD7uxM7_e73Tvlpp5Vy_UXUkZSGc9Bn-gUY6x1N" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_arraydeque"><a class="anchor" href="#_arraydeque"></a>ArrayDeque</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If not <code>LinkedList</code>, then what? Java has a number of high-performant array-based data structures. <code>ArrayList</code> is well-known, but there are also <code>ArrayDeque</code> based on looped array and <code>PriorityQueue</code> based on balanced binary heap, which is actually also an array.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see, for example, how looped buffer of <code>ArrayDeque</code> works.</p>
+</div>
+<div class="paragraph">
+<p>This structure implements queue  capabilities. If maximum number of elements in the queue does not grow over time, this data structure works very fast and memory efficient, with constant time for every operation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">LJV ljv = new LJV().setTreatAsPrimitive(Integer.class);
+
+//note that this sets initial capacity to 5
+Deque&lt;Integer&gt; arrayDeque = new ArrayDeque&lt;&gt;(4);
+arrayDeque.add(1); arrayDeque.add(2); arrayDeque.add(3);
+
+ljv.drawGraph(arrayDeque)</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtTz1Pw0AMnZNfYWXJAmov2UruJBATM1vVwemZ5oS5BOfKp_jvOC1UVAhYmJ7f83vysw8bwaGDK3xAeM0zwXjrg9ji-qI4y7PYe1qOHQ5kB8YQEz2llcpmydgS2ybPsiZhywRtL57ElvMS1sT8Sc2ejgOuQ9xMa6cZDckOdfAg_aPuoy3r0p2L4PMl3W-pmSW_984-zF9DriP0C5j_4UoYeAH1N5fi1FpHt5r-rP7zIWcO93a0Oqb1MY1b5l-UnxobOHVw6F0Q0x3FNBYnN71CeCFrKjW-5e_Y04Pj" alt="Diagram">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">arrayDeque.poll(); //returns 1
+arrayDeque.poll(); //returns 2
+
+ljv.drawGraph(arrayDeque);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtjz9Pw0AMxefkU1hZsoDaJFvJnUTFxNyt6uD03OaEuQTnSvkjvjsOhYoKVV2YbD__nvzs_Fawb-EenxHe00QwPDgvJlvMs5s0CZ2j5dBiT6Zn9CHSS1ypXCwZG2JTp0lSR2yYoOnEkZh8msOamH_G4jAOPa592I5rqx41yVfVxoF0e90Hk1e5vRXB1zt62lE9ie7ATr7h3ybbEroZlBeoiJ5nUP2htI6ptbWr8c_yPx-yYcd8PHlGqS4BJ8q53AVcWzimz4jpkUIcsqtNp8W_kSlKBT_ST8UHhvg=" alt="Diagram">
+</div>
+</div>
+<div class="paragraph">
+<p>Here we reach the end of the buffer and start writing from the beginning:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">arrayDeque.add(4); arrayDeque.add(5); arrayDeque.add(6);
+
+ljv.drawGraph(arrayDeque);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqtT7tOw0AQrO2vWLlxA0rOAYrgOwlERU0XpVjnlvjE5mzOl4SH-HfWCYlipUhDNTuzM9pZ65YB2xqecYPwnSYB_Zt1QWcvj9l9mvjG0qyrsSXdMjof6SPORVYzxopYl2mSlBErJqiaYCnofJzDgpgPVO1p1-LC-WW_NpKRUNihDBZCs5W91_kkNw8h4OcTva-pHEW7947-zKchUxPaKRQXXBEdT0GduQT71jKaef9n8Z8PmbvjvR31a-ahMhnSmyG9vVhXwbWBY-mMmFbkY5ddvTYC7ou0KsT48wu3GoJa" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_hashmap"><a class="anchor" href="#_hashmap"></a>HashMap</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>HashMap</code> is a widely used data structure in Java. For many people, implementation  details of <code>HashMap</code> is also a favorite topic of discussion in a Java programmer job interview.</p>
+</div>
+<div class="paragraph">
+<p>There are a number of ways to implement hash collisions resolution in a hash map, developers of Java platform chose linked lists:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+map.put("one", 1);   map.put("two", 2);
+map.put("three", 3); map.put("four", 4);
+
+new LJV()
+    .setTreatAsPrimitive(Integer.class)
+    .setTreatAsPrimitive(String.class)
+    .drawGraph(map);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrNVctOwzAQPLdfYfmSC9A4jyYNTQ4gIYQEF7ghDm7tkghjR47LU_w7jiGoIlgxoghOzo5nk-zsjk2qa4nrEpzgOwyexyOJ-Q2pZA4vDuD-eMQFoZdNiWua1wxXXNEHdaVhdMnwgrJ8Ph6N5govGAULIQmVued7YEkZ60L0FjY1Xlb8ut0udI5OkmbVDwRIca_3ee6lXnGMm_IU1_OJIm_EyTtzM6NQpaRNKRjJAAoGuDf08ZyqDPA1YwNUypV0Jt9htqaNE_VWkEOx5vq90QCzqZ7oMIsJTI7wUgmZAX8viXt0vbZN0Y_FVdvG4Af9MnGNCTHx7Iv-1UKqHK58WHz8yCaOLHhgwUMLHlnw2IJPLXhiwVMLPrPVZS3YVjGylYxsNSNb0Wizalvbw9-xaewVZ_pgGBjSUjs5AyGKZn6SDns0Ayuxli6eG_YH18eUxZg9Z2SrKdgtwIdWcAp3VoKr1ok5Cgwp-nsdEfJRGrrIKDh1UxFtVcXEqNgpBZO-ivHvqBh9S8U4SBIXFdW9cFMxGBRn-i-mJwzTNJg5la4vV8cRCrc3QrGZn04r2Gb2R0jPGQoNsRsmqI_OHg0ZSnfpQfOhz6yX8SvWDVU1" alt="Diagram">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_collision"><a class="anchor" href="#_collision"></a>Collision</h3>
+<div class="paragraph">
+<p>While the number of collisions on a single <code>HashMap</code> bucket is small, the linked list keeps growing:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">List&lt;String&gt; collisionString = new HashCodeCollision().genCollisionString(3);
+Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+
+for (int i = 0; i &lt; collisionString.size(); i++) {
+    map.put(collisionString.get(i), i);
+}
+
+new LJV()
+    .setDirection(Direction.LR)
+    .setTreatAsPrimitive(Integer.class)
+    .setTreatAsPrimitive(String.class)
+    .setIgnoreNullValuedFields(true)
+    .drawGraph(map);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrVlc9PwjAUx8_jr2h62UVl3QbIZDtgYoxRD14Jhzda2EJtl674M_7vdkMIEWtJjAdO7fv285J-39vraLlQUBXoBp4AvXc8BWJJS5Xi2wd80fGEpGxSF1CxtOJQCs1e9NTIZMIhZzwddTxvpCHnDOVSUaZSP_DRjHG-Cck6rCuYlWLRHGcmxySpdjUbipR8Nuci9Xt-dg11cQfVqKvpGux-kbsZmS4UqwvJaYJI6GAfJb2UK6ETFDnIunxjbopLoFcw01IlKDgb9PZwszYVMdts2tQw_EOx2rgCStt4-EPxKql0iucBzrYX2dWJRQ8temTRY4ves-h9iz6w6OcWfWjzZTVsc0xslonNM7GZJruubW2P_mdGYj-7N1Pp-EgLM0YJGvajMHCQS_aaIABwYE_AV2Y4Aqft-Jhs5-PDbBOn7d4R2c7HB3Y7dHcbnWZoax4L83_AJ3MpdPOWpiRcT0ILxb9DYTIPWm4zNzjYh0hLbB5U3N7lO_XxCXJ5yRQ=" alt="Diagram">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_treeified_collision"><a class="anchor" href="#_treeified_collision"></a>'Treeified' collision</h3>
+<div class="paragraph">
+<p>However, if a single bucket becomes overloaded with collisions, and keys implement <code>Comparable</code> interface, the linked list turns to a tree.</p>
+</div>
+<div class="paragraph">
+<p>This reduces the search time in a bucket from O(N) to O(log(N)) and mitigates a certain kind of DDoS attacks:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">List&lt;String&gt; collisionString = new HashCodeCollision().genCollisionString(6);
+Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+
+for (int i = 0; i &lt; collisionString.size(); i++) {
+    map.put(collisionString.get(i), i);
+}
+
+String graph = new LJV()
+    .setTreatAsPrimitive(String.class)
+    .setTreatAsPrimitive(Integer.class)
+    .setIgnoreNullValuedFields(true)
+    .drawGraph(map);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrVl81vmzAYxs_pX4G45LKu-ItAViI1k6Zp0nrqrerBKU6JygA5tPvS_vcRkmaN4yd4GjtwSnAe4vf3vK_92unqQcsq8z7JZ-n9PBtpWTymK534N3P_3dmoKFN1u85kpZIql6uiVt_qu2aY3OZyofLk8mw0uqzlIlfeotSp0sk4GHv3Ks9fHsn2cV3J-1XxsPl51rzTvKTbz-ZL6unya_N7kYzFePZRrrPPsrq8qNOt8GKnfP3GrM60Wmdlnk49HnVov5Tp-_KpqKceYR3S9eqHcpDlpUw_yPu61FMveDsRR_Lmc-NJ83V2t3GR_oNd7XMl07R9ji32VaWuE38Z-LN9IK_HCRinYJyBcQ7GBRgPwfgEjEdgPEZcEBgRE4RMEDNB0ARRE4RNEDdB4ASRU0ROYa4ROUXkFJFTRE4ROUXkFJFTRM4QOUPkDJY5ImeInCFyhsgZImeInCFyjsg5IueInMMVjsg5IueInCNyjsg5IheIXCBygcgFIhdwc0PkApELRC4QuUDkISIPEXmIyMPX5KhNsf_W1W-0UtfNWaKjsWZN859654TTkIVRzLoa8aP6PvWknM-vZIfyWeZPTWvv-kOtmhPFUuZr1WkWH6RZi6vGrbmbWZP-zBLDNGu-ccvNrNjFrFo_dXsVDtQr91VISH-VNRmsW66VRWhvpTXxzmfevsD8Sqtn_82yLOrNxSch1CqSWhX1sSxsZS_2-3r1kFlU0VDT06x8x_QEvaUnai0Vp9MTuaXHkBXNxR3lMDo9oSHK1RL-k_jLorFHJQ5DB5UVD7aluG6TUX-7ZNxayk8nOnbLoSE7lcP49ISGyF5ZwggdRCUOq9QeFT8MHVQWCQZ7tHMtrbC_0iJkqG45b_Gitx2ekLYC9xUGS5AO9irmeqzhPZbgYC-uziVIe3SLD9Qt98sY6dOt7YplXStWDNZV16YR9Ojqtl2z0-eDnYp0Nv8job39v-Sy44R9JLMfTHYy1hmcWUEgOGbC2oNjrp7shLRjWmpEB6bdyUjntKYQTEuM6MC0pgykgrgdEo_aLwguMGHtwQWungSH4Z06nP6JzT4pN-a0G-JYmvzwAG6Pix0GD_Y_syztcTFjZdlnpNMlnRwS0InF1layL412hzFVv34DJVI0bw==" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_linkedhashmap"><a class="anchor" href="#_linkedhashmap"></a>LinkedHashMap</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the features of <code>HashMap</code> is that this data structure completely 'forgets' the order of insertion of its elements.
+Also, iteration over <code>HashMap</code> is not very effective from performance point of view.
+When insertion order matters, we can use <code>LinkedHashMap</code>, which is actually a <code>HashMap</code> combined with linked list.
+One of the possible use cases for <code>LinkedHashMap</code> is LRU cache implementation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+map.put("one", 1);   map.put("two", 2);
+map.put("three", 3); map.put("four", 4);
+
+new LJV().setDirection(LR)
+    .setTreatAsPrimitive(Integer.class)
+    .setTreatAsPrimitive(String.class)
+    .drawGraph(map);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrNlU9vmzAYxs_Jp7C4cNlWjPkXFrhUm6apU6Veqx7eYFNQXBsZp1037bvP0KYLSywjTZNyAj_8TPw874NC23sFXYO-wiOgn8uFArGlrSq8qxvv43IhJGW3fQMdKzoOrdDsu74zMr7lsGG8WC8Xi7WGDWdoIxVlqvADH1WM8_0Svyz7DqpW3A-PS7PHbFLj1dxQpOSTeS4KP_HLq1ZsGf0CffMNuvWFpi_4xSt_uK_UjWJ9IznNEQ4dLFQV6_vr4VA5qoH3zLHhQdJLuRM6R5GD7NsfzE1xCfQzVFqa3w8-pPERbq5DkOa2vBuiD_9PxpFffhJaPTuO25gJmFhxgDPiQLfsOUdSuAJ9BL4zOWGncXIWxuMwTecY109ynvHQbRy9L9Hb3L0Nq6Vi3rtaCj10rMDhiEXnUQxCsixczYrIfKcz20GcIUVjSMQVUnwGIREcrYI0mxNRLXdqXkKRM6F4TChy1mjE9jl5UGumjikyfdk8Spi_iWMonE7O8io8_QgaBvQYSv5huuO6A0rH9erEtDupdOHVgVe-ZX2oY4seWnRi0SOLHlv0xKKnFj2z6CubL6thm2Nss4xtnrHNND50bWt2ktfJtLXJiW7kdTrtUHoSwmTaR3NmSxn3bfPG09io-A_V8r-hX8vfxkaFug==" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_treemap"><a class="anchor" href="#_treemap"></a>TreeMap</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>TreeMap</code> in Java is a Red-Black tree that implements <code>NavigableMap</code>. This implementation provides guaranteed O(log(N)) time cost for get/put/remove operations, which in practice is inferior to <code>HashMap</code>.</p>
+</div>
+<div class="paragraph">
+<p>We use <code>TreeMap</code> when we need <code>lowerKey(..)</code>, <code>higherKey(..)</code> and other <code>NavigableMap</code> capabilities not provided by a simple <code>Map</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Map&lt;String, Integer&gt; map = new TreeMap&lt;&gt;();
+map.put("one", 1);         map.put("two", 2);
+map.put("three", 3);       map.put("four", 4);
+new LJV().setDirection(LR)
+    .setTreatAsPrimitive(Integer.class)
+    .setTreatAsPrimitive(String.class)
+    .setIgnoreNullValuedFields(true)
+    .drawGraph(map);</code></pre>
+</div>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrNkj1PwzAQhufkV1hZsoBKWncpSRbEgmBBbFWHa31poho7ujgtBfHfcRKCQBScoahM_nrO8vv4RLEmKHN2A1tgL75HoDaioCS4vQ8ufU9pgfMqhxKTUkKhDD6Zhd2O5hKWKJPY97zYwFIiW2oSSEl4EbIVStkvo25ZlbAq1Lo5Tm2NLaJ2tBPBSO_suUrCSZg-EOIdlPHIiA4cvZOfK9KqeMYZ4w7qUYsrXStziLRj82w7TRdN0PHfJOJheq0M7R0v3eB-xkxuszvALcjaJp84sJWWmuyNVKMz-eQfJN_pYbnHx8zNzlP28e9BCYTKBGeZVqZpryQad43RYr2kgIp1foDip5eo1cDmiY4okQ-TOD29nkzXNMwPH-YnA1m5BU1bQdwlqPPYawokZj-2Iv8dir7-CGn9DXr13wD8Q57u" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_concurrentskiplistmap"><a class="anchor" href="#_concurrentskiplistmap"></a>ConcurrentSkipListMap</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>ConcurrentSkipListMap</code> is a thread-safe <code>NavigableMap</code> implementation, that uses quite a complex non-blocking algorithm involving random numbers generator. That&#8217;s why for a given input its internal representation never looks the same from one run to another:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">ConcurrentSkipListMap&lt;String, Integer&gt; map = new ConcurrentSkipListMap&lt;&gt;();
+
+map.put("one", 1);
+map.put("two", 2);
+map.put("three", 3);
+map.put("four", 4);
+
+String actualGraph = new LJV()
+        .setTreatAsPrimitive(Integer.class)
+        .setTreatAsPrimitive(String.class)
+        .drawGraph(map);</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_first_run"><a class="anchor" href="#_first_run"></a>First run</h3>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrFlk1TwjAQhs_0V2R66UUHWhABaWfUkw560KPDITQL7RCTTpqKH-N_N20tI58JIx1O_Xp2su_uu0lJPBM4idA9fsPoy2oIzOYkFr49erKvrAbjBF7SCCfgJxTHTMK7HKvX7gvFE6D-0Go0hhJPKKAJFwSE77QcFAKl1aNbPqYJDmM2yz8HKkYFieKqbggSfKG-M9_pOcEtZ2EmBDD5PI-TUZzKB5wMm5KUYc3fuL_xQchfEyyw5GKAWEapBp_DxzPIY6ME0hAYUSJVwkYRb5hmkB4bVZUTe5JW17xd6jYY5w32jtnJ4I4ReNeu2a7HPZ6zY_21RvEFMyxOp55E2_9OdBUU8Swy7fdFbZIe1V6hH6cB4gz0bh8gVyule3IpMhJgJKatFXNZj5jOAWIW3ESKp4GYOiIMvdhF5wFaKrfzSPtsyplM40_wXa80bAF190OdArpYQkryJtQuoGqm7WJqNqneyV1ldh4Y1rh_cjlTngkTOR29lrUub7VCr4D6-6HSCr39fvEKqDqs7Hw73oTc1kkPs0O2fre1OgC7BJnMUlmbpfhdw-SZ1NktoOpHxI4Aky2QW9sGOeJsdk1UqKbWE5zCNpuu_YzmS99kqXJ-ywQ1bV5Z8KoKNs4TXi_Tt2X9AI_uOTE=" alt="Diagram">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_second_run"><a class="anchor" href="#_second_run"></a>Second run</h3>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNrFlU1PgzAYgM_wKwgXLpqNj81FB4l60kwP7rjsUOg7IKstKWWbGv-7BZwxm6E1GdmpLX3e0Od9-4HzlKMisx7RBlkfpsERXeOch_bsxb4xDcowLMoMFRAWBOVUwE4s5Wd3QVAMJJyahjEVKCZgxYxj4KEzdKwECNkP3XZYFijJaVpPRzJGBvGmlR1scbaV8zR0Jk50z2hScQ5UzNd5MctL8YSK6UDgNmzwHfc7PkrYa4E4EoxfW7QiRIGv4W0O4tQohjIBiqWkXLBWxAaRCspTozJzvGPRsq3LJbvRsi6w108lfSd6oBh2qqSxLdWy4nma6Sr5vSk9y-Og3jG6FdXUCc6us2IV19EJlC6js7swCjoqrlJlfHYVkXHQkvGVMlf9yAT_kNkyHRVPAVH5QGmeq7F1GVk_5nYdaV-sGBVl_g6h67UbtoHG3VDQQKNuyG-goBvyGsj_gWTyjiG3gfYXt50BwsfQpLeKzhhNb7EMVZQiRiX8dSccvN31r--qUm6BoQ6qWdw2R_sk2Khe72GSPs0vPVFr4g==" alt="Diagram">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusion"><a class="anchor" href="#_conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I hope you liked these examples. Maybe you can think of other examples of data layout visualization that are worth adding here. In this case, experiment with <a href="https://github.com/atp-mipt/ljv">Lightweight Java Visualizer</a> and share your ideas!</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
