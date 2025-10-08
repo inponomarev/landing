@@ -27,14 +27,14 @@ a|
 
 * Software engineering, mostly with JVM-based backend.
 * QA in software development.
-* Teaching, training, conference speaking
+* Teaching, training, conference speaking.
 
 === Experience
 
 **October 2021 — present**
 
 [none]
-* **Synthesized** (https://www.synthesized.io/[synthesized.io]) Staff software engineer.  Ensuring best engineering practices in the field of QA and delivery. Proposing and implementing effictive algorithmic solutions.
+* **Synthesized** (https://www.synthesized.io/[synthesized.io]) Staff software engineer. Tech lead (since 2025).  Ensuring best engineering practices in the field of QA and delivery. Proposing and implementing effictive algorithmic solutions.
 
 **June 2016 — October 2021**
 

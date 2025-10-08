@@ -21,6 +21,7 @@ a|
 
 * 16.01.2024 Brighton Kotlin Meetup Brighton, UK (in English) https://youtu.be/2SMPrTV6OVw[youtu.be/2SMPrTV6OVw]
 * **24.04.2024 JPoint 2024 https://youtu.be/3EwPWmXMKzs[youtu.be/3EwPWmXMKzs]** (in Russian)
+* 12.09.2025 NDC Copenhagen Developers Festival
 
 a|
 image::brighton2024.jpg[fitrect="{fitrect}"]
