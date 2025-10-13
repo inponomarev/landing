@@ -34,30 +34,33 @@ a|
 **October 2021 — present**
 
 [none]
-* **Synthesized** (https://www.synthesized.io/[synthesized.io]) Staff software engineer. Tech lead (since 2025).  Ensuring best engineering practices in the field of QA and delivery. Proposing and implementing effictive algorithmic solutions.
+* **Synthesized** (https://www.synthesized.io/[synthesized.io]) — Staff Software Engineer; **Team Lead** (since 2025, 5 people reporting). 
+
+** Led the zero-to-one **LLM-driven QA Agent** initiative: designed agentic architecture (Kotlin + Spring Boot/Spring AI) that orchestrates LLM reasoning with deterministic steps for web/API testing.
+** Delivered **runnable prototypes** on short demo cadences.
+** Drove **test strategy**: JUnit 5, property-based testing (jqwik); UI tests with Selenide.
+** Contributed across core components (data/QA platform), collaborating on **API contracts**, **DSLs**, and developer ergonomics.
+** Helped bootstrap a new **SaaS control-plane** architecture (remote agent execution).
+** Established **engineering standards** for code quality, performance, and reliability; drove design reviews and RFCs (e.g., visual editor and workflow UX).
+** Mentored senior/med-level ICs, guided hiring/interviews, and fostered a pragmatic, experiment-friendly culture.
+** Partnered with product/leadership on roadmap and customer demos; distilled conference/user feedback into actionable requirements.
+** *Tech stack:* Kotlin/Java, Spring Boot & Spring AI, JUnit 5, jqwik, Mockito, Selenide, TestContainers, Allure, Feign/OkHttp, OpenAPI/RestAssured, Gradle/Maven, Docker, Jenkins/GitHub Actions.
+
 
 **June 2016 — October 2021**
 
 [none]
-* Sole proprietorship. IT consultant and tutor. Technical management of the development and deployment of services related to betting/gambling for an online betting/gambling provider based in Cyprus. Technologies involved:  
-**	Backend: Java (Spring Boot microservices), Kafka Streams, PostgreSQL, Redis 
-**	CI/CD: GitHub, Jenkins, Artifactory, Kubernetes, Helm, Terraform.
+* Sole proprietorship. IT consultant and tutor. Technical management of the development (team of 7 people) and deployment of services related to betting/gambling for an online betting/gambling provider based in Cyprus. Technologies involved: Java (Spring Boot microservices), Kafka Streams, PostgreSQL, Redis, GitHub, Jenkins, Artifactory, Kubernetes, Helm, Terraform.
 
 **June 2008 — June 2016**  
 
 [none]
-* **KURS-IT LLC**. (http://curs.ru/[curs.ru]) Project Manager, Tech Lead +
-Java-related software development projects management.
-
-** Development and deployment of informational systems in banking and education. Technologies involved: Java, Tomcat, GWT, MSSQL/DB2/PostrgreSQL. 
-
-** Architecture and implementation of open-source framework Celesta (https://courseorchestra.github.io/celesta/en/[courseorchestra.github.io/celesta/en]).
+* **KURS-IT LLC**. (http://curs.ru/[curs.ru]) Project Manager, Tech Lead.  Java-related software development projects management in education and banking.
 
 **June 2010 — July 2016**
 
 [none]
-* **Lancelot LLC.** (https://lancelot-it.ru/[lancelot-it.ru]) CTO. Co-founder. +
-Managing full cycle of development, deployment and support of ERP system (Microsoft Dynamics) for Moscow headquarters of one of leading electronics manufacturers.
+* **Lancelot LLC.** (https://lancelot-it.ru/[lancelot-it.ru]). Co-founder. Managing full cycle of development, deployment and support of ERP system (Microsoft Dynamics) for Moscow headquarters of one of leading electronics manufacturers.
 
 
 **June 2003 — June 2010**
@@ -69,11 +72,11 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 **October 2000 —  June 2003**
 
 [none]
-* **OOO KURS** Delphi developer. Senior Delphi developer. Participation in development of analytical software.
+* **OOO KURS** Delphi developer. Development of marketing analytical software.
 
 === Work in education
 
-**September 2023 — present**
+**September 2023 — August 2025**
 
 [none]
 * **Northeastern University London** (https://www.nulondon.ac.uk/[nulondon.ac.uk]). Teaching Assistant, Lecturer
@@ -86,39 +89,18 @@ Managing full cycle of development, deployment and support of ERP system (Micros
 **October 2003 — spring 2022**
 
 [none]
-* **Moscow Institute of Physics and Technology** (https://mipt.ru/english/[mipt.ru/english]) Associate Professor, lecturer, tutor.
-
+* **Moscow Institute of Physics and Technology** (https://mipt.ru/english/[mipt.ru/english]) Associate Professor, Tutor.
 
 === Tech conferences
 
-**Program Committee member** of the following conferences:
+**Program Committee member** of **Heisenbug** conference https://heisenbug.ru/en/[heisenbug.ru/en] -- engineering approaches to quality assurance in software.
 
-**autumn 2020 — autumn 2023**
-
-[none]
-* **Heisenbug** https://heisenbug.ru/en/[heisenbug.ru/en] -- engineering approaches to quality assurance in software.
-
-**autumn 2021 — autumn 2023**
-
-[none]
-* **Hydra** https://hydraconf.com/[hydraconf.com] -- concurrent and distributed computing.
-
-**spring 2022 — autumn 2023**
-
-[none]
-* **Flow** https://flowconf.ru/en/[flowconf.ru/en]  -- systems and business analysis. 
-
-
-Follow this link to see an incomplete list of my talks at conferences and meetups: 
+List of my talks at conferences and meetups: 
 https://ponomarev.uk/talks-portfolio.html[ponomarev.uk/talks-portfolio.html]
-
 
 === Blog posts
 
-Follow these links to see lists of blog posts on the respective platforms:
-
-** **Habr** https://habr.com/ru/users/ivanponomarev/posts/[habr.com/ru/users/ivanponomarev/posts/]
-** **DZone** https://dzone.com/users/3168637/iponomarev.html[dzone.com/users/3168637/iponomarev.html] (archived version: https://ponomarev.uk/blog/[ponomarev.uk/blog]).
+** **DZone** archived: https://ponomarev.uk/blog/[ponomarev.uk/blog]
 ** **Confluent**  https://www.confluent.io/blog/author/ivan-ponomarev/[confluent.io/blog/author/ivan-ponomarev]
 
 
