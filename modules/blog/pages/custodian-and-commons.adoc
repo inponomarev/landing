@@ -1,0 +1,459 @@
+= Using Synthesized Custodian to Find Bugs in Apache Commons Lang
+
+== Introduction
+
+This report describes an experiment in which we applied the Synthesized Custodian agentic AI system to a mature, heavily tested open-source project: Apache Commons Lang.
+
+The goal was not to benchmark coverage or test generation in the abstract, but to answer a practical question: _can an LLM-driven agent meaningfully contribute to bug discovery in a well-maintained, highly covered Java library — and if so, what kind of bugs does it find, at what cost, and with what level of noise?_
+
+The results were mixed, instructive, and — in several cases — genuinely impressive.
+
+== Target Project: Apache Commons Lang
+
+Apache Commons Lang, a member of the Apache Commons family of libraries, is a core utility library in the Java ecosystem. The project provides arrays manipulation methods, basic numerical, reflection, concurrency, and serialization utilities. Additionally it contains basic enhancements to `java.util.Date` and a series of utilities dedicated to help with building `hashCode`, `toString` and `equals`.
+
+It has *~100,579 lines of Java code*, which makes it small-to-medium size  project, something that can be fully maintained by only one person.
+
+This library is very mature and, to a certain extent, _ancient_: its first commits date back to *July 19, 2002*. This predates Maven Central and long precedes GitHub, as the project was originally hosted in CVS. Despite its age, the library is actively maintained: in 2025, it received approximately *70 commits per month*.
+
+Although it has only around *3,000 GitHub stars* — a modest number by current standards — it is used by a remarkable *200,000+ open-source repositories* on GitHub alone. Apache Commons Lang is deeply embedded in the Java ecosystem, including countless closed-source systems.
+
+Although on GitHub it has *~3,000 GitHub stars* -- a modest amount to the current standards -- it is used by stunning *200,000+ open-source repositories* on GitHub alone. Commons Lang is deeply embedded in the Java ecosystem, including countless closed-source systems.
+
+In other words, this is a critically important project in the Java ecosystem, and even small improvements to it can have a significant impact.
+
+== Existing tests
+
+Apache Commons Lang is not an under-tested project, to say the least. Using  JaCoCo to measure test coverage, I obtained truly impressive results: ~99% line coverage, ~96% instruction coverage and ~93% branch coverage
+
+.JaCoCo report for Apache Commons Lang
+image::apache_commons_coverage.png[]
+
+This means that any contribution to the library is guarded by extensive tests. As a result, the project is a textbook example of a codebase where extremely high coverage no longer serves as a reliable guide for bug discovery: bugs still exist, but they are hidden within well-covered code. Such bugs are typically specification mismatches or subtle edge-case failures. This makes Apache Commons Lang a good stress test for an automated bug-finding system.
+
+As Apache Commons Lang is a foundational library, the only tests it contains are unit tests in their simplest form. No complex data setup or external services are required; each test class is entirely self-contained. This makes testing in this project significantly different from testing a typical industry application. As a result, when considering potential targets for Synthesized Custodian, it is important to note that this project is not fully representative of real-world systems, which often involve complex integration, stateful environments, and external dependencies.
+
+== Experiment idea 
+
+The core idea was simple: use an LLM-based agent to hunt for bugs by reasoning over documentation, implementation, and existing tests.
+
+Only public methods were analysed, as this was the only category for which it was technically possible to write external test code. In retrospect, I also realised that deprecated classes and methods should have been excluded from the analysis. Doing so would have reduced the overall scope of the experiment and the amount of manual review required.
+
+For each public method, the agent was provided with:
+
+* The method’s Javadoc (expected behaviour)
+* The method implementation. 
+* The implementation of tests that already cover this method.
+
+The prompt for the LLM was to think of potential bugs based on what it sees and to propose additional high-value tests that could reveal inconsistencies or bugs.
+
+In this experiment, we provided the LLM with only the method body itself, without any recursive expansion into called subroutines. Since many methods in this library merely delegate to other methods, the model often saw only three or four lines of code that revealed little about the actual implementation. For other methods, however, the full implementation was visible and available for analysis.
+
+How much implementation code should be exposed to the LLM remains an open question. It seems likely that the results of this experiment could have been improved by applying heuristics that selectively include additional subroutine code when the analysed method is short or consists solely of delegation. The challenge is to do so without introducing excessive  irrelevant details that could confuse the model. On the other hand, in real-world industrial settings, source code is not always available. In such cases, a testing agent must be capable of identifying bugs even when the implementation is hidden.
+
+A particurlarly unique feature of this experiment was the inclusion of the existing test code that covers each method under analysis. The intention was to help the agent focus on untested (or tested but undocumented) behaviour. The prompt explicitly stated that the existing tests were passing, thereby providing the LLM with reliable information about the method’s current, accepted behaviour.
+
+== Worflow structure and implementation
+
+Thus the critical prerequisite was precise impact analysis. I did the following:
+
+* run every test in the project under JaCoCo (https://github.com/jacoco/jacoco)
+* collect the set of methods covered by each test separately (used JUnit5 extension to reset the JaCoCo state before each test)
+* inverted the mapping, obtating for each method the list of tests covering it
+
+
+The resulting intermediate artifact looked like this:
+
+[source,yaml]
+----
+"AnnotationUtils#annotationArrayMemberEquals(Annotation[], Annotation[]):boolean":
+  - "AnnotationUtilsTest#testEquivalence()"
+  - "AnnotationUtilsTest#testNonEquivalentAnnotationsOfSameType()"
+"AnnotationUtils#arrayMemberEquals(Class, Object, Object):boolean":
+  - "AnnotationUtilsTest#testEquivalence()"
+  - "AnnotationUtilsTest#testNonEquivalentAnnotationsOfSameType()"
+"AnnotationUtils#arrayMemberHash(Class, Object):int":
+  - "AnnotationUtilsTest#testHashCode()"
+----
+
+I used JavaParser (https://github.com/javaparser/javaparser) to navigate the code repository and extract corresponding source snippets and Javadoc.
+
+These were provided as the input to the following agentic workflow:
+
+.The agentic workflow
+[graphviz,svg]
+----
+digraph G {
+  rankdir=TB;
+  dpi=150;
+  node[shape=rectangle,style=rounded];
+  N1[label="Prepare docs and code snippets"];
+  N2[label="Using docs, impelementation\nand tests, write an additional\nhigh-value test"]
+  N1->N2;
+  N2->N2[label="Compilation error\nfeedback",color=red];
+  N3[label="Run tests"];
+  N4[label="For each red test,\nmake a verdict"];
+  N2->N3;
+  N3->N4;
+  N4->N2[color=red,constraint=false,style=dashed,label="the verdict is to re-test"];
+  Green[shape=circle,style=filled,color=green,label=""];
+  N3->Green;
+  Red[shape=circle,style=filled,color=red,label=""];
+  N4->Red;
+}
+----
+
+This workflow builds on ideas that we had already applied in previous experiments. The central step is the generation of an “additional high-value test”, intended to reproduce a bug that the agent is attempting to uncover. If the generated test failed to compile, the compilation error was immediately fed back to the LLM, which was then asked to fix the code. This process was repeated for up to five iterations.
+
+Although exact statistics were not recorded, the subjective observation was that, in the majority of cases, the generated code compiled successfully after a single iteration. The number of cases requiring N iterations appeared to decrease rapidly as N increased. Nevertheless, there was a small but non-zero fraction of cases in which the LLM failed to produce compilable code even after five retries. 
+
+In the next step, the generated tests were executed. If a test passed, no further action was taken and the outcome was recorded as “the agent failed to find interesting behaviour.” In principle, the agent could have been instructed to continue exploring the method in such cases; however, due to time constraints, this was not implemented.
+
+If a test failed, the LLM was asked to produce a verdict. Based on the available context, including the generated test code, the failure location, the stack trace, and assertion failure details, the agent had to decide whether the failure indicated a genuine deficiency in the library or whether additional information was required and the test should be regenerated. Again, due to limited time, the feedback loop for test regeneration was not implemented. Instead, the analysis focused exclusively on artefacts that were classified as genuine bugs during the first pass of the workflow.
+
+The experiment produced the following results:
+
+* Impact analysis combined with JavaParser identified 2,821 public methods.
+* 2,120 generated “additional high-value tests” passed successfully, and no further action was taken.
+* 442 cases were classified with a “bug identified” verdict.
+
+All 442 reports were manually reviewed. While *most* of them turned out to be noise or false positives, several findings were genuinely impressive. The remainder of this report focuses on these useful findings, as well as on examples of cases where the system failed.
+
+== Useful findings
+
+=== Documentation-behaviour discrepancies
+
+Perhaps the most illustrative example is a documentation–behaviour discrepancy found in the following method:
+
+[source,java]
+----
+/**
+ * Gets a hash code for an array handling multidimensional arrays correctly.
+[...]
+ * @param array  the array to get a hash code for, {@code null} returns zero.
+ * @return a hash code for the array.
+ */
+public static int hashCode(final Object array)
+----
+
+A review of the existing tests shows that the method’s ability to compute hash codes for multidimensional arrays is thoroughly tested. However, the following seemingly trivial test fails:
+
+[source,java]
+----
+@Test
+void testNullArrayHashCode() {
+  // According to javadoc: "null returns zero"
+  assertEquals(0, ArrayUtils.hashCode(null)); 
+  //Fail, actual result 629
+}
+----
+
+Further investigation revealed that the “null returns zero” promise was introduced as part of a broader Javadoc update that documented null-handling behaviour across multiple methods. At the time of that commit — and, remarkably, for the 23 years that followed — no test verified that this promise actually held for `ArrayUtils.hashCode`. It was only when the AI agent generated and executed this test that the discrepancy was discovered.
+
+Notably, `ArrayUtils.hashCode` itself is just a delegation to underlying hash-calculation utilities. As a result, the LLM did not see the actual implementation logic. Instead, it simply validated the contract stated in the Javadoc and found that the implementation did not uphold it.
+
+This issue was reported as https://issues.apache.org/jira/browse/LANG-1813, and there is ongoing discussion as to whether it should be treated as a bug in the implementation or as an error in the documentation.
+
+A similar issue was identified in the following method:
+
+[source,java]
+----
+/**
+ * Creates a range with the specified minimum and maximum values (both inclusive).
+ *
+[....]
+ * @throws IllegalArgumentException if either element is null.
+ */
+public static DoubleRange of(final Double fromInclusive, final Double toInclusive)
+----
+
+The agent explicitly verified the type of exception thrown when either argument is `null` and determined that the method actually throws a `NullPointerException`, which aligns with Java best practices, rather than the documented `IllegalArgumentException`.
+
+A fix was proposed in https://github.com/apache/commons-lang/pull/1581
+ and was merged promptly. Following this change, several similar cases where `IllegalArgumentException` was documented instead of `NullPointerException` were identified and corrected across the codebase.
+
+=== Static-analysis like findings
+
+The following two findings could, in principle, have been detected by static analysis tools. However, doing so would require fairly sophisticated analysis: these cases lie on the boundary between simple mechanical parsing of code and genuine understanding of its behaviour. In both instances, executing the code was unnecessary—it was sufficient to carefully read and reason about it to identify the deficiencies.
+
+[source,java]
+----
+final class UncheckedFutureImpl<V>  [...]
+
+    @Override
+    public V get() {
+        try {
+            return super.get();
+        } catch (final InterruptedException e) {
+            throw new UncheckedInterruptedException(e); <.>
+        } catch (final ExecutionException e) {
+            throw new UncheckedExecutionException(e);
+        }
+    }
+----
+<.> `Thread.currentThread().interrupt();` is missing, which breaks the cooperative interruption mechanism.
+
+When wrapping `InterruptedException`, the interrupt status should be restored:
+
+[source,java]
+----
+catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+    throw new UncheckedInterruptedException(e);
+}
+----
+
+This is a well-known and widely recommended pattern. It is explicitly described inin Java Concurrency in Practice (Brian Goetz et al.) and appears in commonly used concurrency code review checklists (see https://github.com/code-review-checklists/java-concurrency?tab=readme-ov-file#restore-interruption).
+
+This issue was reported as https://issues.apache.org/jira/browse/LANG-1817
+
+
+Another example is even simpler, but still requires careful reading and understanding of the code:
+
+[source,java]
+----
+if (startIndex < 0 || startIndex > chars.length) {
+    throw new StringIndexOutOfBoundsException("Invalid startIndex: " + length); <.>
+}
+if (length < 0 || startIndex + length > chars.length) {
+    throw new StringIndexOutOfBoundsException("Invalid length: " + length);
+}
+----
+<.> This is a copy-and-paste error: the exception message should reference `startIndex`, not `length`.
+
+Interestingly, this copy-and-paste error was apparently repeatedly propagated: it was copied from the deprecated `StrBuilder` class into the separate `commons-text` library, and later into the currently supported `TextStringBuilder`. As a result, the same mistake appeared in three different Apache Commons libraries and persisted there for decades.
+
+The issue is reported as https://issues.apache.org/jira/browse/TEXT-239
+
+=== Floating-point edge-case
+
+When working with `double` values, special cases such as `NaN` and infinities are often overlooked—but not by the AI agent. An issue reported as https://issues.apache.org/jira/browse/LANG-1816
+ revealed an inconsistency in a family of methods that search for values in arrays of doubles:
+ 
+[source,java]
+----
+final double[] a = {1, Double.NaN, 3};
+// Works (non-tolerance path handles NaN explicitly)
+assertEquals(1, ArrayUtils.indexOf(a, Double.NaN));
+// Fails (tolerance path "forgets" about NaN)
+assertEquals(1, ArrayUtils.indexOf(a, Double.NaN, 0.0));
+// Also fail
+assertTrue(ArrayUtils.contains(a, Double.NaN, 0.0));
+assertTrue(ArrayUtils.indexesOf(a, Double.NaN, 0, 0.0).get(1));
+----
+
+It turned out that the overloaded variants of these methods that accept a tolerance parameter omitted the special-case handling for `NaN`, while the corresponding variants without a tolerance parameter behaved correctly. As a result, logically equivalent operations produced inconsistent results depending solely on which overload was used.
+
+=== Class name parser misinterpreting $ in legitimate class names
+
+The purpose of the `ClassUtils.getShortClassName(..)` family of methods is to return a class name without its package prefix. The main challenge is that, when given only a JVM binary name in `String` form (as returned by `Class.getName()`), it is not always possible to distinguish between a $ used as an inner-class separator and a $ that is legitimately part of a  class name.
+
+For example, `a.b.Outer$Inner` may refer either to the inner class `Outer.Inner` or to a top-level class named `Outer$Inner`. The existing implementation attempted to resolve this ambiguity by parsing the output of `Class.getName()` using heuristics.
+
+The AI agent identified several edge cases where these heuristics failed. As a result, the proposed solution in https://issues.apache.org/jira/browse/LANG-1818
+ is to reimplement `getShortClassName(Class)` using reliable and unambiguous metadata available on the `Class` object itself, rather than attempting to interpret an inherently ambiguous string representation.
+
+=== Integer arithmetic overflows
+
+When the results of integer arithmetic are used as array indices, negligence toward possible overflows can lead to serious bugs.
+
+The AI agent identified a significant issue in `ArrayUtils.subarray(int[] array, int startIndexInclusive, int endIndexExclusive)` (and the corresponding overloads for all the other array types).
+
+According to the documentation, these methods should return an empty array when `endIndexExclusive < startIndexInclusive`. However, for certain combinations of indices, this contract is violated due to integer overflow during index arithmetic.
+
+The problem lies in the computation of the new array size:
+
+[source,java]
+----
+startIndexInclusive = max0(startIndexInclusive);
+endIndexExclusive = Math.min(endIndexExclusive, array.length);
+final int newSize = endIndexExclusive - startIndexInclusive;
+----
+
+The final subtraction may overflow, turning a logically negative size into a positive value. As a result, the method attempts to allocate and/or copy an array instead of returning an empty result. Depending on the overflowed value and available heap size, this leads to either `ArrayIndexOutOfBoundsException`  or `OutOfMemoryError` instead of simply returning an empty array.
+
+[source,java]
+----
+@ParameterizedTest
+@CsvSource({
+        // Normal operation
+        "2, 1",
+        // Overflowed to newSize == 1 (AIOOBE)
+        "2147483647, -2147483648",
+        // Overflowed to a large positive newSize (OOME)
+        "2000000000, -2000000000"
+})
+void testNegativeEndAndHugeStartDoesNotOverflow(int startIndexInclusive, int endIndexExclusive) {
+    int[] array = \{1, 2, 3};
+    int[] result = ArrayUtils.subarray(array, startIndexInclusive, endIndexExclusive);
+    assertEquals(0, result.length);
+}
+----
+
+Interestingly, as a side effect of this investigation, the same issue was found to exist in the analogous method `java.util.Arrays.copyOfRange` in the Java standard library. This was reported to the core-libs-dev mailing list (see https://mail.openjdk.org/pipermail/core-libs-dev/2026-January/158103.html)
+
+Another successful identification of an integer overflow issue involved the deprecated `StrBuilder` class. In this case, the following code does not attempt to allocate a large buffer, but instead results in an `ArrayIndexOutOfBoundsException`:
+
+[source,java]
+----
+StrBuilder sb = new StrBuilder();
+sb.append("x"); // size = 1
+
+// This causes integer overflow: 1 + Integer.MAX_VALUE = -2147483648
+// ensureCapacity receives negative value, does not expand the buffer
+// Then the loop tries to write Integer.MAX_VALUE characters
+sb.appendPadding(Integer.MAX_VALUE, 'a');
+----
+
+No issue was filed, as `StrBuilder` is deprecated. Notably, the newer `org.apache.commons.text.TextStringBuilder` explicitly guards against integer overflows and handles such cases correctly.
+
+=== Deep semantic bug: annotation equality
+
+The agent identified a genuinely non-trivial bug: `AnnotationUtils.equals` always returns false for package-private annotations.
+
+A simple custom test reliably demonstrated the issue:
+
+[source,java]
+----
+public class AnnotationEqualsTest {
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Tag {
+        String value();
+    }
+
+    @Tag("value")
+    private final Object a = new Object();
+    @Tag("value")
+    private final Object b = new Object();
+
+    @Test
+    void equalsWorksOnPackagePrivateAnnotations() throws Exception {
+        Tag tagA = getClass().getDeclaredField("a").getAnnotation(Tag.class);
+        Tag tagB = getClass().getDeclaredField("b").getAnnotation(Tag.class);
+
+        // Expected true; returns false because a reflective access exception is swallowed.
+        Assertions.assertTrue(AnnotationUtils.equals(tagA, tagB));
+    }
+}
+----
+
+Internally, Commons Lang relies on reflection to retrieve and compare annotation members. Two issues combined to produce the incorrect behaviour:
+
+* Before invoking annotation members, the code failed to call `setAccessible(true)`, which led to a `ReflectiveOperationException`.
+* The exception itself was handled in a problematic way:
+
+[source,java]
+----
+} catch (final ReflectiveOperationException ex) {
+    return false;
+}
+----
+
+Here, the exception is silently swallowed and `false` is returned, masking the underlying problem.
+
+This issue was reported as https://issues.apache.org/jira/browse/LANG-1815
+ and represents one of the strongest successes of the experiment.
+
+Identifying this bug required understanding Java reflection and reasoning across multiple lines of code, and in this case, the agent demonstrated allthese capabilities effectively.
+
+== Failures and hallucinations
+
+=== "A classic off-by-one error"
+
+While the experiment demonstrated several successful bug discoveries—resulting in approximately ten filed issues or pull requests—the remaining ~400 artefacts were significantly less useful.
+
+When asked to produce a verdict, the LLM could be highly assertive in its language:
+
+[quote]
+The test has reliably identified a bug in the implementation... This is a classic off-by-one error that occurs when removing multiple elements from an array.
+
+In this case, the agent claimed to have found a serious defect in the following method:
+
+[source,java]
+long[] removeAllOccurrences(final long[] array, final long element)
+
+
+However, closer inspection of the proposed “reproducer” test revealed that the off-by-one error was introduced by the LLM itself:
+
+[source,java,highlight=5]
+----
+int size = 100; long[] array = new long[size]; 
+int expectedRemaining = 0;
+for (int i = 0; i < size; i++) {
+    if (i % 3 == 0) { array[i] = 7L; }
+    else {
+        array[i] = i;
+        expectedRemaining++; <.>
+    }
+}
+long[] result = ArrayUtils.removeAllOccurrences(array, 7L);
+assertEquals(expectedRemaining, result.length);
+----
+<.> Should not increment when `i == 7L`
+
+This example illustrates a recurring failure mode: while the agent is capable of identifying real defects, it can also introduce bugs of its own and present them with a high degree of confidence.
+
+=== Error in step-by-step algorithm tracking
+
+In some cases, the LLM failed to correctly track algorithmic state across multiple operations.
+
+In the example below, the model claimed that consecutive deletions on a StrBuilder do not correctly update its internal state and proposed the following "reproducer":
+
+[source,java]
+----
+@Test
+void testMultipleConsecutiveDeletes() {
+    StrBuilder sb = new StrBuilder("abcdefgh");
+    sb.delete(1, 2).delete(1, 2).delete(1, 2);
+    assertEquals("afgh", sb.toString(),
+            "Multiple consecutive deletes should work correctly");
+}
+----
+
+It justified this expectation with the following step-by-step reasoning (note step 4): 
+
+. Starting with: `"abcdefgh"`_
+. After `delete(1, 2)`: should be `"acdefgh"` (removed 'b')
+. After `delete(1, 2)`: should be `"adefgh"` (removed 'c')
+. After `delete(1, 2)`: should be `"afgh"` (removed 'd') <- incorrect
+. **Expected**: `"afgh"`, **actual**: `"aefgh"`
+
+
+The LLM lost track of the shifting indices and incorrectly concluded that the character 'e' should also be removed. This example highlights a common hallucination pattern: while the agent can generate plausible step-by-step explanations, it may still make subtle but critical mistakes in tracking mutable state across sequential operations.
+
+=== Errors in reasoning
+
+In this example, the LLM claimed to have found a bug because `ClassUtils.isAssignable(Integer[].class, Number[].class)` returned true. Its reasoning was as follows:
+
+[quote]
+In Java, while Integer is assignable to Number, arrays are **invariant** for assignment purposes... While Java arrays are **covariant** at the type system level (it compiles), the question "is assignable" in the context of this method should respect that array assignment has stricter rules than simple reference assignment...
+
+Here, the model conflated two different concepts:
+
+* Assignability of arrays as whole objects — Java arrays are covariant, so `Integer[]` is assignable to `Number[]`.
+* Assignability of array elements — unsafe element assignments are prevented at runtime via `ArrayStoreException`, not at compile time.
+
+Since `ClassUtils.isAssignable(..)` is concerned with type assignability (i.e., whether a reference of one type can be assigned to another), the correct result for `Integer[].class → Number[].class` is `true`.
+
+=== Pure hallucination
+
+[source,java]
+----
+@Test
+void testCaseSensitivityBug() {
+    // This should be false because 'HeLLo' ends with 'LLo', not 'Lo'
+    assertFalse(StringUtils.endsWith("HeLLo", "Lo"),
+            "endsWith should be case-sensitive: 'HeLLo' does not end with 'Lo'");
+}
+----
+
+I don't know how to comment this one.
+
+== Conclusions
+
+*Yes*, our agentic system does produce highly valuable results that are difficult to achieve through static analysis tools or traditional human code review alone. However:
+
+* Effective use of the system requires substantial project-specific customisation, which in turn demands significant human effort (albeit often AI-assisted).
+* The high-value findings are diluted by a large amount of noise and hallucinations, making careful human review indispensable.
+
+In summary, the system functions best not as an autonomous bug finder, but as a powerful amplifier of human expertise — capable of uncovering subtle, deep issues when embedded in a well-designed, human-in-the-loop workflow.
