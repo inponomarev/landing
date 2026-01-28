@@ -18,8 +18,6 @@ This library is very mature and, to a certain extent, _ancient_: its first commi
 
 Although it has only around *3,000 GitHub stars* — a modest number by current standards — it is used by a remarkable *200,000+ open-source repositories* on GitHub alone. Apache Commons Lang is deeply embedded in the Java ecosystem, including countless closed-source systems.
 
-Although on GitHub it has *~3,000 GitHub stars* -- a modest amount to the current standards -- it is used by stunning *200,000+ open-source repositories* on GitHub alone. Commons Lang is deeply embedded in the Java ecosystem, including countless closed-source systems.
-
 In other words, this is a critically important project in the Java ecosystem, and even small improvements to it can have a significant impact.
 
 == Existing tests
