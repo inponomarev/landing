@@ -85,7 +85,6 @@ These were provided as the input to the following agentic workflow:
 ----
 digraph G {
   rankdir=TB;
-  dpi=150;
   node[shape=rectangle,style=rounded];
   N1[label="Prepare docs and code snippets"];
   N2[label="Using docs, impelementation\nand tests, write an additional\nhigh-value test"]
