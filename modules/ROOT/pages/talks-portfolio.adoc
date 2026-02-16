@@ -5,6 +5,25 @@
 
 This is a list of my conference talks  grouped by years and topics. Most of the talks were given repeatedly at several events, the performances that were most successful in my opinion are highlighted **in bold**.
 
+== 2026
+
+=== Automating Documentation: From DSL to Dynamic Docs with Asciidoctor and Antora
+
+[{cols},{grid}]
+|===
+a|
+
+* https://fosdem.org/2026/schedule/event/W99UA3-dsl-to-docs/[fosdem.org/2026/schedule/event/W99UA3-dsl-to-docs]
+
+.Presented at:
+
+* FOSDEM 2026 https://youtu.be/_8rT5h8DHIM[youtu.be/_8rT5h8DHIM]
+a|
+
+image::fosdem26.jpg[fitrect="{fitrect}"]
+|===
+
+
 == 2024
 
 === One Source to Rule Them All: Kotlin DSLs as a Single Source of Truth
@@ -20,13 +39,13 @@ a|
 .Presented at:
 
 * 16.01.2024 Brighton Kotlin Meetup Brighton, UK (in English) https://youtu.be/2SMPrTV6OVw[youtu.be/2SMPrTV6OVw]
-* **24.04.2024 JPoint 2024 https://youtu.be/3EwPWmXMKzs[youtu.be/3EwPWmXMKzs]** (in Russian)
-* 12.09.2025 NDC Copenhagen Developers Festival
+* 24.04.2024 JPoint 2024 https://youtu.be/3EwPWmXMKzs[youtu.be/3EwPWmXMKzs] (in Russian)
+* **12.09.2025 NDC Copenhagen Developers Festival https://youtu.be/0h0i3I8Te6g[youtu.be/0h0i3I8Te6g]**
 
 a|
 image::brighton2024.jpg[fitrect="{fitrect}"]
+image::ndc2025.jpg[fitrect="{fitrect}"]
 |===
-
 
 == 2023
 
