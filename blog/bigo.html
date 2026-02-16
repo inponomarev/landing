@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Using O Notation Beyond Algorithm Analysis</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The term <a href="https://en.wikipedia.org/wiki/Big_O_notation">Big O</a>, which we know from mathematical analysis, was introduced by Paul Bachmann in the late 19<sup>th</sup> century to describe asymptotic function behavior. In the late 1970s, Donald Knuth decided to use it to evaluate algorithm efficiency in terms of time and memory complexity. This familiarized the majority of developers with the Big O. An understanding of the asymptotic behavior of processing time or memory footprint allows selecting the method most appropriate to current requirements. Bad asymptotic behavior allows rejecting the inadequate method immediately.</p>
+</div>
+<div class="paragraph">
+<p>The idea that I’d like to share is not that deep: on the contrary, it&#8217;s right on the surface, but not everyone notices it. You can use methods similar to algorithm analysis for evaluating the asymptotic behavior of the software development project management system parameters. These include the total time and new feature development costs.</p>
+</div>
+<div class="paragraph">
+<p>For instance, scalability is often cited as one of the advantages of a certain product. However, instead of using this rather vague term, we can state that the asymptotic behavior of productive capacity or administration costs in relation to the number of system users/programming modules/instances is, let’s say, not inferior to O(N). If that’s not the case, then scalability is nothing but a euphemism for the marketing smoke and mirrors.</p>
+</div>
+<div class="paragraph">
+<p>On the other hand, some projects are described as collapsing under their own weight. A project may have started off well, but its architecture was structured in a way that the bad asymptotic behavior of alteration costs ruined it.</p>
+</div>
+<div class="paragraph">
+<p>Let’s examine three examples that describe seemingly different effects, which turn out to have a lot in common upon closer examination.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_1"><a class="anchor" href="#_example_1"></a>Example 1</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Every developer has faced a situation when the program, which used to manage its task perfectly with a small initial dataset, began to stall as soon the volume of information increased. It seemed that nothing could go wrong — we were convinced that all the kinks were worked out and the ten-record test set took all the variants into account. The future users were also satisfied — they’ve checked everything against the initial dataset, their critical remarks were taken into account, and they believed that the software could be used in a runtime environment. A catastrophe ensues when the program is launched: it’s unable to function in a runtime environment and everything freezes up.</p>
+</div>
+<div class="paragraph">
+<p>The reason is, of course, the choice of a suboptimal algorithm or data structure. With a seemingly harmless nested loop or convenient API call, which worked fast on a small number of elements (like adding elements one-by-one to a dynamic array), we get a system with an O(n<sup>2</sup>) increase in operation time as a function of the number of elements. To avoid such issues, some hands-on experience and cracking open an algorithm and data structure textbook are enough. So, let’s not dwell on this example.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_2"><a class="anchor" href="#_example_2"></a>Example 2</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Development project leaders are well aware of how the general order of things may deteriorate and grow complicated with the engagement of a new developer — unless you manage to give them a discrete, isolated task. The law described in the Fred Brooks’ classic <a href="https://en.wikipedia.org/wiki/The_Mythical_Man-Month">The Mythical Man-Month</a> states, “adding human resources to a late software project makes it later.” This statement has a very simple and mathematically precise explanation.</p>
+</div>
+<div class="paragraph">
+<p>The dependence of time required for a development project on the number of people involved is established by Brooks as follows: Let <span class="steminline"> <svg style="vertical-align: -0.025ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="1.357ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 600 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></svg> </span> be the number of developers working on the project. The total amount of work comprises:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Tasks that <em>cannot</em> be partitioned.</strong> Their completion time does not depend on the number of developers and equals <span class="steminline"> <svg style="vertical-align: -0.023ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="1.197ex" height="1.02ex" role="img" focusable="false" viewBox="0 -441 529 451"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g></g></g></svg> </span>.</p>
+</li>
+<li>
+<p><strong>Tasks that <em>can</em> be partitioned.</strong> Their completion time decreases with an increase in the number of developers and equals <span class="steminline"> <svg style="vertical-align: -0.566ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="3.459ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 1529 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="TeXAtom" data-mjx-texclass="ORD" transform="translate(429,0)"><g data-mml-node="mo"><path data-c="2F" d="M423 750Q432 750 438 744T444 730Q444 725 271 248T92 -240Q85 -250 75 -250Q68 -250 62 -245T56 -231Q56 -221 230 257T407 740Q411 750 423 750Z"></path></g></g><g data-mml-node="mi" transform="translate(929,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></svg> </span>.</p>
+</li>
+<li>
+<p><strong>Exchange of information.</strong> Brooks writes, “If each part of the task must be separately coordinated with each other part, the effort increases as <span class="steminline"> <svg style="vertical-align: -0.781ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="6.204ex" height="3.15ex" role="img" focusable="false" viewBox="0 -1047.1 2742.3 1392.1"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mfrac"><g data-mml-node="mrow" transform="translate(220,516.8) scale(0.707)"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(600,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(989,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1589,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(2367,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(2867,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g><g data-mml-node="mn" transform="translate(1194.4,-345) scale(0.707)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g><rect width="2502.3" height="60" x="120" y="220"></rect></g></g></g></svg> </span>.” This means that if there are ndevelopers, the amount of effort spent on coordinating everyone is proportional to the number of links in a complete graph (a graph where each pair of vertices is connected):</p>
+</li>
+</ol>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/pic1.png" alt="pic1">
+</div>
+</div>
+<div class="paragraph">
+<p>Since the efforts are distributed between developers, their contribution to the completion time is described as <span class="steminline"> <svg style="vertical-align: -0.566ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="7.994ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 3533.4 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D450" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g><g data-mml-node="mo" transform="translate(433,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(822,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(1644.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(2644.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(3144.4,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg> </span>.</p>
+</div>
+<div class="paragraph">
+<p>Thus, the total time required for project completion is defined by the following curve:</p>
+</div>
+<div class="stemblock">
+  <div class="content halign-center valign-middle" style="padding-top: 1rem">
+<svg style="vertical-align: -1.577ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="17.075ex" height="4.676ex" role="img" focusable="false" viewBox="0 -1370 7547.3 2067"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mo" transform="translate(751.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mfrac" transform="translate(1751.4,0)"><g data-mml-node="mi" transform="translate(305.5,676)"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="mi" transform="translate(220,-686)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><rect width="800" height="60" x="120" y="220"></rect></g><g data-mml-node="mo" transform="translate(3013.7,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(4013.9,0)"><path data-c="1D450" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g><g data-mml-node="mo" transform="translate(4446.9,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(4835.9,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(5658.1,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(6658.3,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(7158.3,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg>
+  </div>
+</div>
+<div class="paragraph">
+<p>With the following graph:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/brooks-en.png" alt="brooks en" width="50%">
+</div>
+</div>
+<div class="paragraph">
+<p>Meanwhile, the efforts in man-hours are determined by the following formula:</p>
+</div>
+<div class="stemblock">
+  <div class="content halign-center valign-middle" style="padding-top: 1rem">
+<svg style="vertical-align: -0.566ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="17.051ex" height="2.262ex" role="img" focusable="false" viewBox="0 -750 7536.3 1000"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mo" transform="translate(751.2,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(1751.4,0)"><path data-c="1D44F" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path></g><g data-mml-node="mo" transform="translate(2402.7,0)"><path data-c="2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></g><g data-mml-node="mi" transform="translate(3402.9,0)"><path data-c="1D450" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g><g data-mml-node="mi" transform="translate(3835.9,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(4435.9,0)"><path data-c="28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path></g><g data-mml-node="mi" transform="translate(4824.9,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(5647.1,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(6647.3,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g><g data-mml-node="mo" transform="translate(7147.3,0)"><path data-c="29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path></g></g></g></svg>
+  </div>
+</div>
+<div class="paragraph">
+<p>The key idea proposed by F. Brooks states that the increase in the number of developers in a team leads to a decrease in project completion time only to a certain extent, after which an increase of completion time occurs. Applying O notation to the obtained patterns, we can state that in a Brooks project, the completion time increases with an increase in the number of developers as O(n) and the project cost as O(n<sup>2</sup>).</p>
+</div>
+<div class="paragraph">
+<p>This is essential knowledge for a project leader who has to decide whether or not to engage new developers in a project that’s pressed for time, right?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_3"><a class="anchor" href="#_example_3"></a>Example 3</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Another classic example of a badly growing dependence is cited in all Agile methodology books. It&#8217;s the increase in cost of change as a function of the project age.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/badproject-en.png" alt="badproject en" width="50%">
+</div>
+</div>
+<div class="paragraph">
+<p>Once again, explaining this dependence is easy if you realize that the development of a programming project begins to resemble a complete graph, where project-related artifacts (programming modules, requirements, tests, documentation) are the vertices:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/pic2.png" alt="pic2">
+</div>
+</div>
+<div class="paragraph">
+<p>The introduction of each subsequent vertex to this graph costs more and more each time since more and more links with the already existing vertices emerge. Moreover, it often requires an upgrade of the existing vertices, which are linked to the new one (changes in the interface, tests, documentation). Afterward, alterations begin cascading in an avalanche-like manner until homeostasis is attained. Depending on how the connections between the artifacts function in a project, we can obtain a polynomial with a large power coefficient O(n<sup>k</sup>). The cost of change increases as a function of the already existing project artifacts.</p>
+</div>
+<div class="paragraph">
+<p>As a result of this activity, at some point, the project development stalls, all the time is wasted on dealing with old issues, new alterations are introduced at an unacceptably slow rate, and, with colossal difficulties, developers keep saying that “everything has to be rewritten” — in other words, the project begins to collapse under its own weight.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusion"><a class="anchor" href="#_conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Despite the fact that the examples cited describe entirely different effects, it&#8217;s easy to see that they have a lot in common: everything started off well and ended badly. In all cases, this was due to the inability to evaluate the asymptotic behavior of the key system parameters during further development.</p>
+</div>
+<div class="paragraph">
+<p>In the first case, the problem is resolved by the choice of algorithm or data structure with proper asymptotic behavior.</p>
+</div>
+<div class="paragraph">
+<p>In the second and third examples, the problem is in the non-linear growth of the number of connections in a complete graph. If your system resembles a complete graph, there&#8217;s no reason to expect that an increase in the number of elements will lead to positive consequences. A model of a graph with connections has an illustrative or qualitative rather than quantitative nature, and the connection graph does not need to be complete in the strict sense of the word. For Brooks’ Law and the cost of change growth effect to manifest, the graph only needs to have a tendency towards completeness. On the other hand, the least number of connections that a graph with <span class="steminline"> <svg style="vertical-align: -0.025ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="1.357ex" height="1.025ex" role="img" focusable="false" viewBox="0 -442 600 453"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g></g></g></svg> </span> of vertices can have is equal to <span class="steminline"> <svg style="vertical-align: -0.186ex; overflow: visible;" xmlns="http://www.w3.org/2000/svg" width="5.254ex" height="1.692ex" role="img" focusable="false" viewBox="0 -666 2322.4 748"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mo" transform="translate(822.2,0)"><path data-c="2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path></g><g data-mml-node="mn" transform="translate(1822.4,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></svg> </span>, such as, for example, in a star-type graph:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/pic3.png" alt="pic3">
+</div>
+</div>
+<div class="paragraph">
+<p>If the connections within a system are structured in a star-like manner, in a linear fashion, or in any other way that creates O(n) edges with n vertices, we get a system that behaves in a qualitatively different manner when growing: the cost of adding a new vertex in such a system is always a constant.</p>
+</div>
+<div class="paragraph">
+<p>Just a few words on how to obtain this result in practice. Generally, all aspects of the project should be optimized: from program architecture to project specialist labor management.</p>
+</div>
+<div class="paragraph">
+<p>When designing an application, we can utilize the star-like quality of the platform-plugins architecture. It has a certain basic segment — the application’s core or platform — which is developed with all possible meticulousness and rarely altered. All of the application’s functions use the core’s services and interact with each other only through the core. Meanwhile, the core itself does not depend on plugins.</p>
+</div>
+<div class="paragraph">
+<p>In object-oriented development, this principle can be conveniently implemented via the source-subscriber pattern, and particularly via the mediator pattern.</p>
+</div>
+<div class="paragraph">
+<p>In distributed environments, we can utilize message brokers.</p>
+</div>
+<div class="paragraph">
+<p>Considering the above, it is clear that some initial overhead expenses for programming such architecture are compensated later by the savings on the interaction between add-ins’ developers and the coordination of add-ins among themselves. Task partitioning becomes possible, and engaging new developers in the project becomes simple and safe.</p>
+</div>
+<div class="paragraph">
+<p>The effect described by Brooks should also be diminished by managing intra-project communications (a decrease in the quadratically growing part of labor efforts). For instance, general employee briefings and blanket e-mail newsletters with the maximum of information on current operations allow each of the participants <a href="https://en.wikipedia.org/wiki/Combinatorial_explosion#Communication">to interact with the “central vertex”</a> without the need to search for the proper addressee. Project managers are aware that communication problems are not merely limited to huge projects; they emerge even when four participants are involved and as the project grows, they can reach truly cosmic dimensions.</p>
+</div>
+<div class="paragraph">
+<p>The Agile approach provides a whole set of measures to attain O(1)-asymptotic behavior of the alteration cost increase. Besides the importance of communication management (including such radical methods as paired programming), special attention is heeded to development via testing. It involves the creation of rigid and isolated ‘functional requirement-test-code’ links that do not lead to the emergence of extraneous connections and all-around dependencies. The perfect dependence of alteration cost on the phase of the project, according to Agile, is as follows:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/xpproject-en.png" alt="xpproject en" width="50%">
+</div>
+</div>
+<div class="paragraph">
+<p>As mentioned before, the idea articulated in this article lays on the surface. We, the developers, can evaluate the algorithm’s behavior as the task grows more complex. So, why not begin similarly forecasting the development project parameter behavior as the project grows and develops? We can optimize algorithms and get rid of unnecessary cycles and calculations. Why not optimize the entire development project, clearing out unneeded connections and dependences?</p>
+</div>
+<div class="paragraph">
+<p>You might also be interested in reading <a href="https://getlighthouse.com/blog/developing-leaders-team-grows-big/">Developing Leaders: What to Do When Your Team Grows Too Big</a> (more complete graphs!).</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

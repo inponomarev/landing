@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Type Variance in Java and Kotlin</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>“There are three kinds of variance: invariance, covariance, and contravariance…”</em></p>
+</div>
+<div class="paragraph">
+<p>t looks pretty scary already, doesn’t it? If we search Wikipedia, we will find covariance and contravariance in category theory and linear algebra. Some of you who learned these subjects in university might be having dreadful flashbacks because it can be complex stuff.</p>
+</div>
+<div class="paragraph">
+<p>Because these terms look so scary, people avoid learning this topic regarding programming languages. From my experience, many middle-level and sometimes senior-level Java and Kotlin developers fail to understand type variance. This leads to a poor design of internal APIs because to create convenient APIs using generics, you need to understand type variance, otherwise, you either don’t use generics at all or use them incorrectly. It is all about creating better APIs.</p>
+</div>
+<div class="paragraph">
+<p>If we compare a program to a building, then its internal API is the foundation of the building. If your internal API is convenient, then your code is more robust and maintainable. So let’s fill this gap in our knowledge.</p>
+</div>
+<div class="paragraph">
+<p>The best way to explain this topic is with a historical and evolutionary perspective. I will start by considering examples from ancient and primitive concepts such as arrays that appeared in early Java versions, through Java Collections API, and finally, Kotlin, which has an advanced type variance. Going from simple to more complex examples, you’ll see how language features have evolved and what problems were solved by introducing these language features.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>After reading this article no mysteries will remain about Java’s “<code>? extends</code>,” “<code>? super</code>,” or Kotlin’s “<code>in</code>” and “<code>out</code>.”</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>For illustration purposes, I’ll be using the same example of type hierarchy everywhere:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNrjSs5JLC5WCEgtKs7PU6jmquXigoi45hbk5FempiKL-SbmJaanFkGEoFpsanTharngmkCiUNVcAGbiINE=" alt="hier">
+</div>
+</div>
+<div class="paragraph">
+<p>We have a base class called <code>Person</code>, a subclass called <code>Employee</code>, and another subclass called <code>Manager</code>. Each <code>Employee</code> is a <code>Person</code>, each <code>Manager</code> is a <code>Person</code>, and each <code>Manager</code> is an <code>Employee</code>, but not necessarily vice versa: some of the <code>Persons</code> are not <code>Employees</code>.</p>
+</div>
+<div class="paragraph">
+<p>In Java and Kotlin, this means you can assign an expression of type <code>Manager</code> to a variable of type <code>Employee</code> and so on, but not vice versa.</p>
+</div>
+<div class="paragraph">
+<p>We will also consider a lot of code examples and for all of them, we’re interested in only four kinds of possible outcomes. We will use emojis to identify them:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;">
+<col style="width: 90%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The code won’t compile.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The code will compile and run, but there will be a runtime exception.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The code will compile and run normally.</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/hp.png" alt="hp"></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>The heap pollution will occur.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Heap pollution is a situation where a variable of a certain type contains an object of the wrong type. For example, a variable declared as a String refers to an instance of a Manager or Employee. Yes, it is what it looks like: a flaw in the language’s type system. In general, this should not happen, but this sometimes happens both in Java and in Kotlin, and I’ll show you an example of heap pollution as well.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_covariance_of_reified_java_arrays"><a class="anchor" href="#_covariance_of_reified_java_arrays"></a>Covariance of Reified Java Arrays</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Arrays have been present in Java for more than twenty-five years, starting from Java 1.0, and in a way, we can consider arrays as a prototype for generics. For example, when we have a <code>Manager</code> type, we can build an array <code>Manager[]</code>  and by getting elements of this array, we are getting values of the <code>Manager</code> type.</p>
+</div>
+<div class="paragraph">
+<p>It is trivial about the types of variables that we get from the array, but what about assigning the values to the array’s elements? Can we assign a <code>Manager</code> as an element of <code>Employee[]</code>? And what about the <code>Person</code>?</p>
+</div>
+<div class="paragraph">
+<p>All of the possible combinations are represented in the table below. Have a look and try to figure out what is going on:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. The result of assigning a value to an element of a Java array</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Person</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Employee</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Manager</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>null</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Object[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Person[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Employee[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Manager[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span> <span class="image"><img src="_images/rt.png" alt="rt"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The rightmost column is green because in Java <code>null</code> can be assigned (and returned) everywhere.</p>
+</div>
+<div class="paragraph">
+<p>In the lower-left corner, we have cases that won’t compile, which also makes sense: you cannot assign a <code>Person</code> to an <code>Employee</code> or <code>Manager</code> without an explicit type cast, and thus, you cannot set a <code>Person</code> as an element of an array of employees or managers. That’s the main idea of type checking!</p>
+</div>
+<div class="paragraph">
+<p>Everything was understandable so far, but what about the rest of the combinations? We would expect that assigning an Employee to an element of <code>Employee[]</code>, <code>Person[]</code>, or <code>Object[]</code> will cause no problems, just as assigning it to a variable of type <code>Employee</code>, <code>Person</code>, or <code>Object</code>. What do these exclamation marks mean? A runtime exception? Why? What is this exception and what can go wrong?</p>
+</div>
+<div class="paragraph">
+<p>I will explain this soon.</p>
+</div>
+<div class="paragraph">
+<p>Meanwhile, let’s consider another question: Can we assign a Java array of a given type to an array of another type? That is, can we assign <code>Employee[]</code> to <code>Person[]</code>? And vice versa?</p>
+</div>
+<div class="paragraph">
+<p>All the possible combinations are given in the following table:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Can we assign a Java array of a given type to an array of another type?</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="right">To →</span></p>
+</div>
+<div class="paragraph">
+<p>From ↓</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Object[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Person[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Employee[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Manager[]</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Object[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Person[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Employee[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Manager[]</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>We could remove square brackets and this would give us a table of possible assignments of simple objects: <code>Employee</code> is assignable to <code>Person</code>, but <code>Person</code> is not assignable to <code>Employee</code>. Since each <code>Manager</code> is an <code>Employee</code>, then an array of managers is an array of employees, right? At this point, we can already say that arrays in Java are covariant against the types of their elements, but we will go back to strict terms soon. The following UML diagram is valid:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNrjSs5JLC5WCEgtKs7PU6jmquXigoi45hbk5FempiKLKUGURSvEKqEIw9QiJLiQldrU6OqiKkKR1rODWs_FBXUGWANMPdAsZK16dnAJAMCTOq8=" alt="Covariance">
+</div>
+<div class="title">Figure 1. Covariance</div>
+</div>
+<div class="paragraph">
+<p>Now have a look at the code below to see how it behaves:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Manager[] managers = new Manager[10];
+Person[] persons = managers; //this should compile and run
+persons[0] = new Person();   //line 1 ??
+Manager m = managers[0];     //line 2 ?!</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nothing special happens in the beginning. Since the <code>Manager</code> is a <code>Person</code>, the assignment is possible. But since arrays, just like any objects, are reference types in Java, both <code>manager</code> and <code>person</code> variables keep the reference to the same object. On <strong>line 1</strong>, we are trying to insert a <code>Person</code> into this array.</p>
+</div>
+<div class="paragraph">
+<p><em>Note:</em> the compiler type-checking cannot prevent us from doing this. But if this line is allowed to be executed, then, on <strong>line 2</strong>   , we should expect a catastrophic error: an array of <code>Manager</code>  s will contain someone who is not a <code>Manager</code>—in other words, heap pollution.</p>
+</div>
+<div class="paragraph">
+<p>But Java won’t let you do it here. Experienced Java developers might know that an <code>ArrayStoreException</code> will occur on <strong>line 1</strong>. To prevent heap pollution, an array object “knows” the type of its elements in runtime, and each time we assign a value, a runtime check is performed. This explains the exclamation marks in one of the previous tables: writing a non-null value to any Java array, generally speaking, may lead to an <code>ArrayStoreException</code> if the actual type of the array is the subtype of the array variable.</p>
+</div>
+<div class="paragraph">
+<p>The ability of a container to “know” the type of its elements is called “reification.” So now we know that arrays in Java are <em>covariant</em> and <em>reified</em>.</p>
+</div>
+<div class="paragraph">
+<p>To sum up, we may say that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The need for arrays reification and runtime check (and possible runtime exceptions) comes from the covariance of arrays (the fact that the <code>Manager[]</code> array can be assigned to <code>Person[]</code>).</p>
+</li>
+<li>
+<p>Covariance is safe when we read values, but can lead to problems when we write values. <em>Note</em>: the problem is so huge that Java even abandoned the main static language objective here, that is to have all the type checking in compile time, and behaves more like a dynamically-typed language (e.g., Python) in this scenario.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You might ask:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>“Was covariance the right choice for Java arrays?”</p>
+</li>
+<li>
+<p>“What if we just prohibit the assignment of arrays of different types?”</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In this case, it would have been impossible to assign <code>Manager[]</code> to <code>Person[]</code>, we would have known the array elements type at compile time, and there would have been no need to resort to run-time checking.</p>
+</div>
+<div class="paragraph">
+<p>The ability of the type to be assignable only to the variables of the same type strictly is called <em>invariance</em>, and we will discover it in Java and Kotlin generics very soon. But imagine the problems that the invariance of arrays would have led to in Java.</p>
+</div>
+<div class="paragraph">
+<p>Imagine we have a method that accepts a <code>Person[]</code> as its argument and calculates, for example, the average age of the given people:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Double calculateAverageAge(Person[] people)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we have a variable of type <code>Manager[]</code>. Managers are people, but can we pass this variable as an argument for <code>calculateAverageAge</code>?</p>
+</div>
+<div class="paragraph">
+<p>In Java we can because of the covariance of arrays. If arrays were invariant, we would have to create a new array of type <code>Person[]</code>, copy all the values from <code>Manager[]</code> to this array, and only then call the method. The memory and CPU overhead would have been enormous.</p>
+</div>
+<div class="paragraph">
+<p>This is why invariance is impractical in APIs, and this is the real reason why Java arrays are covariant (although covariance implies difficulties with value assignments). The example of Java arrays shows the full range of problems associated with type variance. Java and Kotlin generics tried to address these problems.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_invariance_of_java_and_kotlin_mutable_lists"><a class="anchor" href="#_invariance_of_java_and_kotlin_mutable_lists"></a>Invariance of Java and Kotlin Mutable Lists</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I believe you are familiar with the concept of generics. In Java and Kotlin, given that list is not empty, we will have the following return types of <code>list.get(0)</code>:</p>
+</div>
+<table class="tableblock frame-all grid-all" style="width: 60%;">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>type of <code>list</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>type of <code>list.get(0)</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Person&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Person</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;?&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Object</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;*&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Any?</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The difference between Java and Kotlin is in the last two lines. Both Java and Kotlin have a notion of an “unknown” type parameter: both <code>List&lt;?&gt;</code> in Java and <code>List&lt;*&gt;</code> in Kotlin denote “a <code>List</code> of elements of some type, and we don’t know/don’t care what the type is.” In Java, everything is nullable, thus the <code>Object</code> type returned by <code>list.get(&#8230;&#8203;)</code> can be <code>null</code>. In Kotlin, we have to care about nullability, thus get the method for <code>List&lt;*&gt;</code> returns <code>Any?</code></p>
+</div>
+<div class="paragraph">
+<p>Now, let’s build the same tables we have previously built for Java arrays. First, let’s consider the assignment of elements. Here we will find a huge difference between Java and Kotlin Collections API (and as we will discover very soon, this difference is tightly related to the difference between type variance in Java and Kotlin). In Java, every <code>List</code> has methods for its modification (<code>add</code>, <code>remove</code>, and so on).</p>
+</div>
+<div class="paragraph">
+<p>The difference between mutable and immutable collections in Java is visible only in runtime. We may have <code>UnsupportedModificationException</code> if we try to change an immutable list. In Kotlin, mutability is visible at compile time. The <code>List</code> interface itself does not have any modification methods, and if we want mutability, we need to use <code>MutableList</code>.</p>
+</div>
+<div class="paragraph">
+<p>In other respects, <code>List&lt;..&gt;</code> in Java and <code>MutableList&lt;..&gt;</code> in Kotlin are nearly the same. Here are the results of the <code>list.add(…)</code> method in Java and Kotlin:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. What is the result of <code>list.add(…)</code> method in Java and Kotlin?</caption>
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 15%;">
+<col style="width: 15%;">
+<col style="width: 15%;">
+<col style="width: 15%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Person</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Employee</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>Manager</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>null</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Person&gt;</code> /
+<code>MutableList&lt;Person?&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Employee&gt;</code> /
+<code>MutableList&lt;Employee?&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Manager&gt;</code> /
+<code>MutableList&lt;Manager?&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;?&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>MutableList&lt;*&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Why we cannot add a null to <code>MutableList&lt;*&gt;</code> is understandable: “star” may mean any type, both nullable and non-nullable. Since we don’t know anything about the actual type and its nullability, we cannot allow adding nullable values to <code>MutableList&lt;*&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p><em>Note</em>: we don’t have anything similar to ArrayStoreException, although the table looks similar to the one we have built for arrays so far. Now, let’s try to figure out when we can assign Java and Kotlin lists to each other. All the possible combinations are presented here:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Can we assign these lists to each other?</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="right">To →</span></p>
+</div>
+<div class="paragraph">
+<p>From ↓</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List</code> / <code>MutableList</code> <code>&lt;Person&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List</code> / <code>MutableList</code> <code>&lt;Employee&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List</code> / <code>MutableList</code> <code>&lt;Manager&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;?&gt;</code>/ <code>MutableList&lt;*&gt;</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List/MutableList</code> <code>&lt;Person&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List/MutableList</code> <code>&lt;Employee&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List/MutableList</code> <code>&lt;Manager&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;?&gt;</code> /
+<code>MutableList&lt;*&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The rightmost green column means that <code>List&lt;?&gt;</code>/<code>MutableList&lt;*&gt;</code> are universally assignable: since we “don’t care” about the actual type parameter, we can assign anything. In the rest of the diagram, we see the green diagonal, which means that <code>MutableList&lt;&#8230;&#8203;&gt;</code> can be assigned only to a <code>MutableList</code> parameterized with the same type. In other words, <code>List&lt;T&gt;</code> in Java and <code>MutableList&lt;T&gt;</code>  in Kotlin are invariant against the type parameters.</p>
+</div>
+<div class="paragraph">
+<p>This cuts off the possibility of insertion of elements of the wrong type already in compilation time:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">List&lt;Manager&gt; managers = new ArrayList&lt;&gt;();
+List&lt;Person&gt; persons = managers; //won't compile
+persons.add(new Person());  //no runtime check is possible</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Two concerns may arise at this point:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>As we know from the Java arrays example, invariance is bad for building APIs. What if we need a method that processes <code>List&lt;Person&gt;</code>, but can be called with <code>List&lt;Manager&gt;</code> without having to copy the whole list element by element?</p>
+</li>
+<li>
+<p>Why not implement everything the same way as for arrays?</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The answer for the first concern is the declaration site and use site variance that we are going to consider soon. The answer to the second question is that, unlike arrays, which are <em>reified</em>, generics in Java and Kotlin are <em>type erased</em>, which means they have no information about their type parameters in run time, and run-time type checking is impossible. Let’s dive deeper into type erasure now.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_type_erasure_genericsarrays_incompatibility_and_heap_pollution"><a class="anchor" href="#_type_erasure_genericsarrays_incompatibility_and_heap_pollution"></a>Type Erasure, Generics/Arrays Incompatibility, and Heap Pollution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the reasons why the Java platform implements generics via type erasure is purely historical. Generics appeared in Java version 5 when the Java platform already was quite mature. Java keeps backward compatibility at the source code and bytecode level, which means that very old source code can be compiled in modern Java versions, and very old compiled libraries can be used in modern applications by placing them on the classpath. To facilitate an upgrade to Java 5, the decision had been made to implement Generics as a language feature, not a platform feature.</p>
+</div>
+<div class="paragraph">
+<p>This means that in run time JVM doesn’t know anything about generics and their type parameters. For example, a simple <code>Pair&lt;T&gt;</code> class is compiled to byte code in the following way (type parameter <code>T</code> is “erased” and replaced with <code>Object</code>):</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 45%;">
+<col style="width: 55%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><strong>Generic Type (source)</strong></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><strong>Raw Type (compiled)</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Pair&lt;T&gt; {
+  private T first;
+  private T second;
+  Pair(T first,
+       T second)
+   {this.first = first;
+    this.second = second;}
+  T getFirst()
+   {return first; }
+  T getSecond()
+   {return second; }
+  void setFirst(T newValue)
+   {first = newValue;}
+  void setSecond(T newValue)
+   {second = newValue;}
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Pair {
+  private Object first;
+  private Object second;
+  Pair(Object first,
+       Object second)
+   {this.first = first;
+    this.second = second;}
+  Object getFirst()
+   {return first; }
+  Object getSecond()
+   {return second; }
+  void setFirst(Object newValue)
+   {first = newValue;}
+  void setSecond(Object newValue)
+   {second = newValue;}
+}</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Or, if we use bounded types in the generic type definition, the type parameter is replaced with boundary type:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 45%;">
+<col style="width: 55%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><strong>Generic Type (source)</strong></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><strong>Raw Type (compiled)</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Pair&lt;T extends Employee&gt;{
+  private T first;
+  private T second;
+  Pair(T first,
+       T second)
+   {this.first = first;
+    this.second = second;}
+  T getFirst()
+   {return first; }
+  T getSecond()
+   {return second; }
+  void setFirst(T newValue)
+   {first = newValue;}
+  void setSecond(T newValue)
+   {second = newValue;}
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Pair {
+  private Employee first;
+  private Employee second;
+  Pair(Employee first,
+       Employee second)
+   {this.first = first;
+    this.second = second;}
+  Employee getFirst()
+   {return first; }
+  Employee getSecond()
+   {return second; }
+  void setFirst(Employee newValue)
+   {first = newValue;}
+  void setSecond(Employee newValue)
+   {second = newValue;}
+}</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This implies many strict and sometimes counterintuitive limitations on how we can use generics in Java and Kotlin. If you want to know more details (e.g. if you want to know more about bounded types, and know what “bridge methods” are), you can refer to my lecture on Java Generics (<a href="https://www.youtube.com/watch?v=G9_7S34a3ms">video</a>,    <a href="https://inponomarev.github.io/java-mipt/slides06/index-en.html#/">slides</a>). But the most important restriction is the following: neither in Java nor Kotlin can we determine the type parameter in the runtime.</p>
+</div>
+<div class="paragraph">
+<p>In the following situation,</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/png/eNrjSs5JLC5WUApIzCyysbdTUqjm0tXV5arl4kKWCC4pysxLB8uiS_km5iWmpxbB5bi4EGbZ1OjqopmAQxpuChcAu0wo8Q==" alt="rawtype">
+</div>
+</div>
+<div class="paragraph">
+<p>These code snippets won’t compile:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Java</strong></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Kotlin</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">if (a instanceof Pair&lt;String&gt;) ...</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">if (a is Pair&lt;String&gt;) ...</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>But these will compile and run successfully, although probably we would like to know more about <code>a</code>:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Java</strong></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Kotlin</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">if (a instanceof Pair&lt;?&gt;) ...</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">if (a is Pair&lt;*&gt;) ...</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>An important implication of this is Java arrays and generic incompatibility. For example, the following line wont compile in Java with the error “generic array creation:”</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">List&lt;String&gt;[] a = new ArrayList&lt;String&gt;[10];</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As we know, Java arrays need to keep the full type information in runtime, while all the information that will be available in this case is that it is an array of <code>ArrayList</code>   of something unknown (“<code>String</code>” type parameter will be erased).</p>
+</div>
+<div class="paragraph">
+<p>Interestingly, we can overcome this protection and create an array of generics in Java (either via type cast or varargs (variable arguments) parameter), and then easily make heap pollution with it.</p>
+</div>
+<div class="paragraph">
+<p>But let’s consider another example. It doesn’t involve Java arrays and thus it is possible both in Java and Kotlin:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Java</strong></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Kotlin</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Pair&lt;Integer&gt; intPair =
+       new Pair&lt;&gt;(42, 0);
+Pair&lt;?&gt; pair = intPair;
+Pair&lt;String&gt; stringPair =
+        (Pair&lt;String&gt;) pair;
+stringPair.b = "foo";
+System.out.println(
+        intPair.a * intPair.b);</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">var intPair = Pair&lt;Int&gt;(42, 0)
+var pair: Pair&lt;*&gt; = intPair
+var stringPair: Pair&lt;String&gt; =
+           pair as Pair&lt;String&gt;
+stringPair.b = "foo"
+println(intPair.a * intPair.b)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top" colspan="2"><div class="content"><div class="paragraph">
+<p>An example of heap pollution. A chimera appears!</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/hp.png" alt="hp">
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>First, we create a pair of integers. Then we “forget” its type in compile time and through explicit typecast we are casting it to a pair of <code>Strings</code>.</p>
+</div>
+<div class="paragraph">
+<p><em>Note</em>: we cannot cast <code>intPair</code> to <code>stringPair</code> straightforwardly: <code>Integer</code> cannot be cast to <code>String</code>, and the compiler will warn us about it. But we can do this via <code>Pair&lt;?&gt;</code> / <code>Pair &lt;*&gt;</code>: although there will be a warning about unsafe typecast, the compiler won’t prohibit the typecast in this scenario (we can imagine a <code>Pair&lt;String&gt;</code> casted to <code>Pair&lt;?&gt;</code> and then explicitly casted back to <code>Pair&lt;String&gt;</code>).</p>
+</div>
+<div class="paragraph">
+<p>Then something weird happens: we assign a <code>String</code> to the second component of our object, and this code is going to compile and run. It compiles because the compiler “thinks” that <code>b</code> has a type of <code>String</code>. It runs because in runtime there are no checks, and the type of <code>b</code> is <code>Object</code>. After the execution of this line, we have a “chimera” object: its first variable is <code>Integer</code>, its second variable is <code>String</code>, and it’s neither <code>Pair&lt;String&gt;</code> nor <code>Pair&lt;Integer&gt;</code>. We’ve broken the type safety of Java and Kotlin and made heap pollution.</p>
+</div>
+<div class="paragraph">
+<p>To sum up:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Because of type erasure, it’s impossible to perform type checking of objects passed to generics in run time.</p>
+</li>
+<li>
+<p>It’s unsafe to store type-erased generics in Java native reified arrays.</p>
+</li>
+<li>
+<p>Both Java and Kotlin languages permit heap pollution: a situation where a variable of some type refers to an object that is not of that type.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_site_covariance"><a class="anchor" href="#_use_site_covariance"></a>Use Site Covariance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Imagine we are facing the following practical task: we are implementing a class <code>MyList&lt;E&gt;</code>, and we want it to have the ability to add elements from other lists via the <code>addAllFrom</code> method and the ability to add its elements to another list via <code>addAllTo</code>.</p>
+</div>
+<div class="paragraph">
+<p>Since we have the usual <code>Manager</code> – <code>Employee</code> – <code>Person</code> inheritance chain, these must be the valid and invalid options:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">MyList&lt;Manager&gt; managers = ...
+MyList&lt;Employee&gt; employees = ...
+
+//Valid options, we want these to be compilable!
+employees.addAllFrom(managers);
+managers.addAllTo(employees);
+
+//Invalid options, we don't want these to be compilable!
+managers.addAllFrom(employees);
+employees.addAllTo(managers);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A naive approach (the one that, unfortunately, I’ve seen many times in real life projects) is to use type parameters straightforwardly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class MyList&lt;E&gt; implements Iterable&lt;E&gt; {
+    void add(E item) { ... }
+    //Don't do this :-(
+    void addAllFrom(MyList&lt;E&gt; list) {
+        for (E item : list) this.add(item);
+    }
+    void addAllTo(MyList&lt;E&gt; list) {
+        for (E item : this) list.add(item);
+    }
+  ...}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, when we try to write the following code, it will not compile.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">MyList&lt;Manager&gt; managers = ...;  MyList&lt;Employee&gt; employees = ...;
+employees.addAllFrom(managers); managers.addAllTo(employees);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I often see people struggling with this: they tried to introduce generic classes in their code, but these classes were unusable. Now we know why this happens: it is due to the invariance of <code>MyList</code>. We have figured out that due to the lack of runtime type-checking, type invariance is the best that can be done for type safety of Java’s <code>List</code>/ Kotlin’s <code>MutableList</code>.</p>
+</div>
+<div class="paragraph">
+<p>Both Java and Kotlin offer a solution for this problem: to create convenient APIs, we need to use <em>wildcard types</em> in Java or <em>type projections</em> in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>Let’s look at Java first:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNrjSs5JLC5WUPKt9MksLrGxV0itKEnNSylWcM0tyMmvTE21U1Ko5qrl4kJVhyKLKe2bmJeYnloEl8VrvE2Nri4Wg0nRBbePCwCUWkMp" alt="wildext">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class MyList&lt;E&gt; implements Iterable&lt;E&gt; {
+    void addAllFrom (List&lt;? extends E&gt; list){
+       for (Е item: list) add(item); }
+}
+MyList&lt;Manager&gt; managers = ...; MyList&lt;Employee&gt; employees = ...
+employees.addAllFrom(managers);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>List&lt;? extends E&gt;</code> means: “a list of any type will do as soon as this type is a subtype of <code>E</code>.” When we iterate over this list, the items can be safely cast to “<code>E</code>.” And since our list is a list of “<code>E</code>,” then we can safely add these elements to our list. The program will compile and run.</p>
+</div>
+<div class="paragraph">
+<p>In Kotlin, this looks very similar, but instead of “<code>? extends E</code>,” we are using “<code>out E</code>:”</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNpLzkksLlZQ8sksLrHJLy1RcM0tyMmvTE21U1Ko5qrl4uJKRlKAIgmSRZb0TcxLTE8tgsthNdOmRlcXwzDCauFmcwEAe_03uQ==" alt="outext">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyList&lt;E&gt; : Iterable&lt;E&gt; {
+    fun addAllFrom(list: MyList&lt;out E&gt;) {
+        for (item in list) add(item) }
+}
+val managers: MyList&lt;Manager&gt; = ... ; val employees: MyList&lt;Employee&gt; = ...
+employees.addAllFrom(managers)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By declaring <code>&lt;? extends E&gt;</code> or <code>&lt;out E&gt;</code> are making the type of the argument covariant. But to avoid heap pollution, this implies certain limitations to what can be done with the variable declared with wildcard types/type projections.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>One of my favourite questions for a Java technical interview is: given a variable declared as <code>List&lt;? extends E&gt; list</code> in Java, what can be done with this variable?</p>
+</div>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Of course, we can use <code>list.get(&#8230;&#8203;)</code>, and the return type will be <code>E</code>.</p>
+</li>
+<li>
+<p>On the other hand, if we have a variable <code>E element</code>, we cannot use <code>list.add(element)</code>: such code won’t compile. Why? We know that the list is a list of elements of some type which is a subtype of <code>E</code>. But we don’t know what subtype. For example, if <code>E</code> is Person, then <code>? extends E</code> might be <code>Employee</code> or <code>Manager</code>. We cannot blindly append a <code>Person</code> to such a list then.</p>
+</li>
+<li>
+<p>An interesting exception: <code>list.add(null)</code> will compile and run. This happens because <code>null</code> in Java is assignable to a variable of any type, and thus it is safe to add it to any list.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We can also use an “unbounded wildcard” in Java, which is just a question mark in triangular braces, like in <code>Foo&lt;?&gt;</code>.  The rules for it are as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If <code>Foo&lt;T extends Bound&gt;</code>, <code>then Foo&lt;?&gt;</code> is the same as <code>Foo&lt;? extends Bound&gt;</code>.</p>
+</li>
+<li>
+<p>We can read elements, but only as <code>Bound</code> (or <code>Object</code>, if no <code>Bound</code> is given).</p>
+</li>
+<li>
+<p>If we’re using intersection types <code>Foo&lt;T extends Bound1 &amp; Bound2&gt;</code>, any of the bound types will do.</p>
+</li>
+<li>
+<p>We can put only <code>null</code> values.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>What about covariant types in Kotlin? Unlike Java, nullability now plays a role. If we have a function parameter with a type <code>MyList&lt;out E?&gt;</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We can read values typed <code>E?</code>.</p>
+</li>
+<li>
+<p>We cannot add anything.</p>
+</li>
+<li>
+<p>Even <code>null</code> won’t do because, although we have nullable <code>E?</code>, <code>out</code> means any subtype. In Kotlin, a non-nullable type is a subtype of a nullable type. So the actual type of the list element might be non-nullable, and this is why Kotlin won’t let you add an even <code>null</code> to such a list.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_use_site_contravariance"><a class="anchor" href="#_use_site_contravariance"></a>Use Site Contravariance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We’ve been talking about covariance so far. Covariant types are good for reading values and bad for writing. What about contravariance? Before figuring out where it might be needed, let’s have a look at the following diagram:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Covariant&lt;out E&gt;</code></p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/png/eNpLzkksLlYISC0qzs9TqOaq5UoGC7jmFuTkV6amIgkpOeeXJRZlJuaV2ECU2ylhl4Xphcpj02dTo6uLXQtW5Xp2UBdyQR0K1g_TxIXVID07uDwAGUZOFQ==" alt="covclass">
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Contravariant&lt;in E&gt;</code></p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/png/eNpLzkksLlYISC0qzs9TqOaq5UoGC7jmFuTkV6amIgkpOefnlRQlliUWZSbmldhAtNgp4VYBMwOqBmqHgoJNja6uAtwGLty6gApLdXHZy4Vbo54dLsPhjtazg_qZCwAhM1ky" alt="contravclass">
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Unlike in covariant types, subtyping works the other way around in contravariant ones, and this makes them good for writing values, but bad for reading.</p>
+</div>
+<div class="paragraph">
+<p>The classical example of a use case for contravariance is <code>Predicate&lt;E&gt;</code>, which is a functional type that takes <code>E</code> as an argument and returns a <code>boolean</code> value.</p>
+</div>
+<div class="paragraph">
+<p>The wider the type of <code>E</code> in a predicate, the more “powerful” it is. For example, <code>Predicate&lt;Person&gt;</code> can substitute <code>Predicate&lt;Employee&gt;</code> (because <code>Employee</code> is a <code>Person</code>), and thus it can be considered as its subtype. Of course, everything is invariant in Java and Kotlin by default, and this is why we need to use another kind of wildcard type and type projections.</p>
+</div>
+<div class="paragraph">
+<p>The <code>addAllTo</code> method of our <code>MyList</code> class can be implemented the following way:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/png/eNrj4krOSSwuVlDyySwusbFXKC4tSC1ScM0tyMmvTE21U1Ko5qrl4kJRhCIJkkWWDEgtKs7Pg0vhNNamRlcXTQtxqhGiXAC2Ezrn" alt="wildsup">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class MyList&lt;E&gt; implements Iterable&lt;E&gt; {
+    void addAllTo (List&lt;? super E&gt; list) {
+       for (Е item: this) list.add(item); }
+}
+MyList&lt;Employee&gt; employees = ...; MyList&lt;Person&gt; people = ...;
+
+employees.addAllTo(people);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>List&lt;? super E&gt;</code> means “a list of any type will do as soon as this type is <code>E</code> or a supertype of <code>E</code>, up to <code>Object</code>.” When we iterate over our list, our items, which have type <code>E</code>, can be safely cast to this unknown type and can be safely added to another list. The program will compile and run.</p>
+</div>
+<div class="paragraph">
+<p>In Kotlin it looks the same, but we use <code>MyList&lt;in E&gt;</code> instead of <code>MyList&lt;? super E&gt;</code>:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/png/eNrjSs5JLC5WUPLJLC6xycxTcM0tyMmvTE21U1Ko5qrl4uJClkeRBMkiSwakFhXn58GlsJloU6Ori2EUQaUwg7kAQNo1uA==" alt="inext">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyList&lt;E&gt; : Iterable&lt;E&gt; {
+    fun addAllTo(list: MyList&lt;in E&gt;) {
+        for (item in this) list.add(item) }
+}
+val employees: MyList&lt;Employee&gt; = ... ; val people: MyList&lt;Person&gt; = ...
+
+employees.addAllTo(people)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What can be done with an object typed <code>List&lt;? super E&gt;</code> in Java?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When we have an element of type <code>E</code>, we can successfully add it to this list.</p>
+</li>
+<li>
+<p>The same works for <code>null</code>. <code>null</code> can be added everywhere in Java.</p>
+</li>
+<li>
+<p>We can call <code>get(..)</code> method for such a list, but we read its values only as <code>Object</code> s. Indeed, <code>&lt;? super E&gt;</code> means that the actual type parameter is unknown and can be anything up to <code>Object</code>, so <code>Object</code> is the only safe assumption about the type of <code>list.get(..)</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>And what about Kotlin? Again, nullability plays a role. If we have a parameter <code>list: MyList&lt;in E&gt;</code>, then:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We can add elements of type <code>E</code> to the list.</p>
+</li>
+<li>
+<p>We cannot add nulls (but we can add nulls if the variable is declared like <code>MyList&lt;in E?&gt;</code>).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The type of its elements (e. g. the type of <code>list.first()</code>) is <code>Any?</code> – mind the question mark. In Kotlin, “<code>Any?</code>” is a universal supertype, while “<code>Any</code>” is a subtype of “<code>Any?</code>”. If a type is contravariant, it can always potentially hold nulls.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pecs_the_mnemonic_rule_for_java"><a class="anchor" href="#_pecs_the_mnemonic_rule_for_java"></a>PECS: The Mnemonic Rule for Java</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now we know that covariance is for reading (and writing is generally prohibited to a covariantly-typed object), and contravariance is for writing (and although we can read values for contravariant-typed objects, all the type information is lost).</p>
+</div>
+<div class="paragraph">
+<p>Joshua Bloch in his famous “Effective Java” book proposes the following mnemonic rule for Java programmers:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>PECS: Producer — Extends, Consumer — Super</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>This rule makes it simple to reason about the correct wildcard types in your API. If, for example, an argument for our method is a Function, we should always (no exceptions here) declare it this way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">void myMethod(Function&lt;? super T, ? extends R&gt; arg)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>T</code> parameter in <code>Function</code> is a type of the input, i.e. something that is being consumed, and thus we use <code>? super</code> for it. The <code>R</code> parameter is the result, something that is produced, and thus we use <code>? extends</code>. This trick will allow us to use any compatible <code>Function</code> as an argument. Any <code>Function</code> that can process <code>T</code> or its supertype will do, as well as any <code>Function</code> that yields <code>R</code> or any of its subtypes.</p>
+</div>
+<div class="paragraph">
+<p>In the standard Java library API, we can see a lot of examples of wildcard types, all of them following the PECS rule. For example, a method that finds a maximum number in a <code>Collection</code> given a <code>Comparator</code> is defined like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public static &lt;T&gt; T max (Collection&lt;? extends T&gt; coll,
+                         Comparator&lt;? super T&gt; comp)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This allows us to conveniently use the following parameters: <code>Collections.max(List&lt;Integer&gt;, Comparator&lt;Number&gt;)</code>     (if we can compare any <code>Number</code> s, then we can compare <code>Integer</code> s), <code>Collections.max(List&lt;String&gt;, Comparator&lt;Object&gt;</code>) (if we can compare <code>Object</code> s, then we can compare <code>String</code> s).</p>
+</div>
+<div class="paragraph">
+<p>In Kotlin, it is easy to memorize that producers always use the “<code>out</code>” keyword and consumers use “<code>in</code> .” Although Kotlin syntax is more concise and “<code>in</code>/<code>out</code>” keywords make it clearer which type is used for producer and which for consumer, it is still very useful to understand that “<code>out</code>” actually means a subtype, while “<code>in</code>” means a supertype.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_declaration_site_variance_in_kotlin"><a class="anchor" href="#_declaration_site_variance_in_kotlin"></a>Declaration Site Variance in Kotlin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now we’re going to consider a feature that Kotlin has and Java doesn’t have: declaration site variance.</p>
+</div>
+<div class="paragraph">
+<p>Let’s have a look at Kotlin’s immutable <code>List</code>. When we check the assignability of Kotlin’s <code>List</code>, we find that it looks similar to Java arrays. In other words, Kotlin’s <code>List</code> is <em>covariant</em> itself:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Can we assign these immutable lists in Kotlin to each other?</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="right">To →</span></p>
+</div>
+<div class="paragraph">
+<p>From ↓</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Person&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Employee&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Manager&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;*&gt;</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Person&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Employee&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;Manager&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>List&lt;*&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Сovariance for Kotlin’s <code>List</code> doesn’t imply any problems related to Java covariant arrays, since you cannot add or modify anything. When just reading the values, we can safely cast <code>Manager</code> to <code>Employee</code>. That’s why a Kotlin function that requires <code>List&lt;Person&gt;</code> as its parameter will happily accept, say, <code>List&lt;Manager&gt;</code> even if that parameter does not use type projections.</p>
+</div>
+<div class="paragraph">
+<p>There is no similar functionality in Java. When we compare the declaration of the List interface in Java and Kotlin, we’ll see the difference:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Java</strong></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Kotlin</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public interface
+  List&lt;E&gt;
+  extends Collection&lt;E&gt;
+{...}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">public interface
+  List&lt;out E&gt; : Collection&lt;E&gt;
+{...}</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The keyword “<code>out</code>” in type declaration makes the <code>List</code> interface in Kotlin a covariant type everywhere.</p>
+</div>
+<div class="paragraph">
+<p>Of course, you cannot make any type covariant in Kotlin: only those that are not using type parameters as an argument of a public method (while return type for <code>E</code> is OK). So it’s a good idea to declare all your immutable classes as covariant in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>In our ‘<code>MyList</code>’ example we might also want to introduce an immutable pair like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyImmutablePair&lt;out E&gt;(val a: E, val b: E)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this class, we can only declare methods that return something of type <code>E</code>, but not public methods that will have <code>E</code>-typed arguments.</p>
+</div>
+<div class="paragraph">
+<p><em>Note</em>: constructor parameters and private methods with <code>E</code>-typed arguments are OK.</p>
+</div>
+<div class="paragraph">
+<p>Now, if we want to add a method that takes values from   <code>MyImmutablePair</code>, we don’t need to bother about use-site variance.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyList&lt;E&gt; : Iterable&lt;E&gt; {
+  //Don't bother about use-site type variance!
+  fun addAllFrom(pair: MyImmutablePair&lt;E&gt;){
+    add(pair.a); add(pair.b) }
+  ...
+}
+val twoManagers: MyImmutablePair&lt;Manager&gt; = ...
+employees.addAllFrom(twoManagers)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The same applies to contravariance, of course. We might want to define a contravariant class <code>MyConsumer</code> in this way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyConsumer&lt;in E&gt; {
+    fun consume(p: E){
+        ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As soon as we defined a type as contravariant, the following limitations emerge:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>We can define methods that have <code>E</code>-typed arguments, but we cannot expose anything of type <code>E</code>.</p>
+</li>
+<li>
+<p>We can have private class variables of type <code>E</code>, and even private methods that return <code>E</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>addAllTo</code> method, which dumps all the values to the given consumer, now doesn’t need to use type projections. The following code will compile and run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">class MyList&lt;E&gt; : Iterable&lt;E&gt; {
+  //Don't bother about use-site type variance!
+  fun addAllTo(consumer: MyConsumer&lt;E&gt;){
+        for (item in this) consumer.consume(item)
+  }
+  ...
+}
+val employees: MyList&lt;Employee&gt; = ...
+val personConsumer: MyConsumer&lt;Person&gt; = ...
+employees.addAllTo(personConsumer)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The one thing that’s worth mentioning is how declaration-site variance influences star projection <code>Foo&lt;*&gt;</code>. If we have an object typed <code>Foo&lt;*&gt;</code>, does it matter if <code>Foo</code> class is defined as invariant, covariant, or contravariant if we want to do something with this object?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the original type declaration is <code>Foo&lt;T : TUpper&gt;</code> (invariant), then, of course, you can read values as TUpper, and you cannot write anything (even <code>null</code>), because we don’t know the exact type.</p>
+</li>
+<li>
+<p>If <code>Foo&lt;out T : TUpper&gt;</code> is covariant, you can still read values as TUpper, and you cannot write anything just because there are no public methods for writing in this class.</p>
+</li>
+<li>
+<p>If <code>Foo&lt;in T : TUpper&gt;</code> is contravariant, then you cannot read anything (because there are no such public methods) and you still cannot write anything (because you “forgot” the exact type). So the contravariant <code>Foo&lt;*&gt;</code> variable is the most useless thing in Kotlin.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_kotlin_is_better_for_the_creation_of_fluent_apis"><a class="anchor" href="#_kotlin_is_better_for_the_creation_of_fluent_apis"></a>Kotlin Is Better for the Creation of Fluent APIs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When we consider switching between languages, the most important question is: what can a new language provide that cannot be achieved with the old one? The more concise syntax is good, but if everything that a new language offers is just syntactic sugar, then maybe it is not worth switching from familiar tools and ecosystems.</p>
+</div>
+<div class="paragraph">
+<p>In regards to type variance in Kotlin vs. Java, the question is: does declaration site variance provide the options that are impossible in Java with wildcard types?
+In my opinion, the answer is definitely <strong>yes</strong>, as use site variance is not just about getting rid of “<code>? extends</code>” and “<code>? super</code>” everywhere.</p>
+</div>
+<div class="paragraph">
+<p>Here’s a real-life example of the problems that arise when we design APIs for data streaming processing frameworks (in particular, this example relates to Apache Kafka Streams API).</p>
+</div>
+<div class="paragraph">
+<p>The key classes of such frameworks are abstractions of data streams, like <code>KStream&lt;K&gt;</code>, which are semantically covariant: stream of <code>Employee</code> can be safely considered as a stream of <code>Person</code> if all that we are interested in are <code>Person</code>’s properties.</p>
+</div>
+<div class="paragraph">
+<p>Now imagine that in library code we have a class which accepts a funciton capable of transforming into a stream.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Processor&lt;E&gt; {
+  void withFunction(Function&lt;? super KStream&lt;E&gt;,
+                             ? extends KStream&lt;E&gt;&gt; chain) {...}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the user’s code these functions may look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">KStream&lt;Employee&gt; transformA(KStream&lt;Employee&gt; s) {...}
+KStream&lt;Manager&gt; transformB(KStream&lt;Person&gt; s) {...}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, both of these functions can work as a transformer from <code>KStream&lt;Employee&gt;</code> to <code>KStream&lt;Employee&gt;</code>. But if we try to use them as method references passed to the <code>withFunction</code> method, only the first one will do:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">Processor&lt;Employee&gt; processor = ...
+//Compiles
+processor.withFunction(this::transformA);
+//Won't compile with "KStream&lt;Employee&gt; is not convertible to KStream&lt;Person&gt;"
+processor.withFunction(this::transformB);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The problem cannot be fixed by just adding more “<code>? extends</code>.” If we define the class in this way:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Processor&lt;E&gt; {
+  //A mind-blowing number of question marks
+  void withFunction(Function&lt;? super KStream&lt;? super E&gt;,
+                             ? extends KStream&lt;? extends E&gt;&gt; chain) {...}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>then both lines</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">processor.withFunction(this::transformA);
+processor.withFunction(this::transformB);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>will fail to compile with something like “  <code>KStream&lt;capture of ? super Employee&gt;</code> is not convertible to <code>KStream&lt;Employee&gt;</code>.” Type calculation in Java is not too “wise” to support complex recursive definitions.</p>
+</div>
+<div class="paragraph">
+<p>Meanwhile in Kotlin, if we declare class <code>KStream&lt;out E&gt;</code> as covariant, this is easily possible:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">/* LIBRARY CODE */
+class KStream&lt;out E&gt;
+class Processor&lt;E&gt; {
+  fun withFunction(chain: (KStream&lt;E&gt;) -&gt; KStream&lt;E&gt;) {}
+}
+/* USER'S CODE */
+fun transformA(s: KStream&lt;Employee&gt;): KStream&lt;Employee&gt; { ... }
+fun transformB(s: KStream&lt;Person&gt;): KStream&lt;Manager&gt; { ... }
+val processor: Processor&lt;Employee&gt; = Processor()
+processor.withFunction(this::transformA)
+processor.withFunction(this::transformB)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All the lines will compile and run as intended (besides the fact that we have more concise syntax).</p>
+</div>
+<div class="paragraph">
+<p>Kotlin has a clear win in this scenario.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusion"><a class="anchor" href="#_conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To sum up, here are some properties of different kinds of type variance.</p>
+</div>
+<div class="paragraph">
+<p><span class="underline">Covariance</span> is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>? extends</code> in Java</p>
+</li>
+<li>
+<p><code>out</code> in Kotlin</p>
+</li>
+<li>
+<p>safe reading, unsafe or impossible writing</p>
+</li>
+<li>
+<p>described by the following diagram:</p>
+</li>
+</ul>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNpTUFBQSM5JLC5WCEgtKs7PU6jmquWCCLjmFuTkV6amIgkpOeeXJRZlJuaV2ECU2ylhl4Xphcpj02dTo6uLXQtW5Xp2UBdyQR0K1g_TxIXVID07uDwAjIpOlQ==" alt="covclass">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When <code>A</code> is a supertype of <code>B</code>, then the matrix of possible assignments fills the lower left corner:</p>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 34%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="right">To →</span></p>
+</div>
+<div class="paragraph">
+<p>From ↓</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;A&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;B&gt;</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;A&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;B&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><span class="underline">Contravariance</span> is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>? super</code> in Java</p>
+</li>
+<li>
+<p><code>in</code> in Kotlin</p>
+</li>
+<li>
+<p>safe writing, type information lost or impossible reading</p>
+</li>
+<li>
+<p>described by the following diagram:</p>
+</li>
+</ul>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNpLzkksLlYISC0qzs9TqOaq5UoGC7jmFuTkV6amIgkpOefnlRQlliUWZSbmldhAtNgp4VYBMwOqBmqHgoJNja6uAtwGLty6gApLdXHZy4Vbo54dLsPhjtazg_qZCwAhM1ky" alt="contravclass">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>When <code>A</code> is a supertype of <code>B</code>, then the matrix of possible assignments fills the upper right corner:</p>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 34%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="right">To →</span></p>
+</div>
+<div class="paragraph">
+<p>From ↓</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;A&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;B&gt;</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;A&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;B&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><span class="underline">Invariance</span> is:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>assumed in Java and Kotlin by default</p>
+</li>
+<li>
+<p>safe writing and reading</p>
+</li>
+<li>
+<p>when <code>A</code> is a supertype of <code>B</code>, then the matrix of possible assignments fills only the diagonal:</p>
+</li>
+</ul>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 34%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><span class="right">To →</span></p>
+</div>
+<div class="paragraph">
+<p>From ↓</p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;A&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;B&gt;</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;A&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>C&lt;B&gt;</code></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/wc.png" alt="wc"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="_images/ok.png" alt="ok"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>To create good APIs, understanding type variance is necessary. Kotlin offers great enhancements for Java Generics, making usage of ready-made generic types even more straightforward. But to create your generic types in Kotlin, it’s even more important to understand the principles of type variance.</p>
+</div>
+<div class="paragraph">
+<p>I hope that it’s now clear how type variance works and how it can be used in your APIs. Thanks for reading.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
