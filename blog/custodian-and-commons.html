@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Using Synthesized Custodian to Find Bugs in Apache Commons Lang</h1>
+<div class="sect1">
+<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This report describes an experiment in which we applied the Synthesized Custodian agentic AI system to a mature, heavily tested open-source project: Apache Commons Lang.</p>
+</div>
+<div class="paragraph">
+<p>The goal was not to benchmark coverage or test generation in the abstract, but to answer a practical question: <em>can an LLM-driven agent meaningfully contribute to bug discovery in a well-maintained, highly covered Java library — and if so, what kind of bugs does it find, at what cost, and with what level of noise?</em></p>
+</div>
+<div class="paragraph">
+<p>The results were mixed, instructive, and — in several cases — genuinely impressive.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_target_project_apache_commons_lang"><a class="anchor" href="#_target_project_apache_commons_lang"></a>Target Project: Apache Commons Lang</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache Commons Lang, a member of the Apache Commons family of libraries, is a core utility library in the Java ecosystem. The project provides arrays manipulation methods, basic numerical, reflection, concurrency, and serialization utilities. Additionally it contains basic enhancements to <code>java.util.Date</code> and a series of utilities dedicated to help with building <code>hashCode</code>, <code>toString</code> and <code>equals</code>.</p>
+</div>
+<div class="paragraph">
+<p>It has <strong>~100,579 lines of Java code</strong>, which makes it small-to-medium size  project, something that can be fully maintained by only one person.</p>
+</div>
+<div class="paragraph">
+<p>This library is very mature and, to a certain extent, <em>ancient</em>: its first commits date back to <strong>July 19, 2002</strong>. This predates Maven Central and long precedes GitHub, as the project was originally hosted in CVS. Despite its age, the library is actively maintained: in 2025, it received approximately <strong>70 commits per month</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Although it has only around <strong>3,000 GitHub stars</strong> — a modest number by current standards — it is used by a remarkable <strong>200,000+ open-source repositories</strong> on GitHub alone. Apache Commons Lang is deeply embedded in the Java ecosystem, including countless closed-source systems.</p>
+</div>
+<div class="paragraph">
+<p>In other words, this is a critically important project in the Java ecosystem, and even small improvements to it can have a significant impact.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_existing_tests"><a class="anchor" href="#_existing_tests"></a>Existing tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apache Commons Lang is not an under-tested project, to say the least. Using  JaCoCo to measure test coverage, I obtained truly impressive results: ~99% line coverage, ~96% instruction coverage and ~93% branch coverage</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/apache_commons_coverage.png" alt="apache commons coverage">
+</div>
+<div class="title">Figure 1. JaCoCo report for Apache Commons Lang</div>
+</div>
+<div class="paragraph">
+<p>This means that any contribution to the library is guarded by extensive tests. As a result, the project is a textbook example of a codebase where extremely high coverage no longer serves as a reliable guide for bug discovery: bugs still exist, but they are hidden within well-covered code. Such bugs are typically specification mismatches or subtle edge-case failures. This makes Apache Commons Lang a good stress test for an automated bug-finding system.</p>
+</div>
+<div class="paragraph">
+<p>As Apache Commons Lang is a foundational library, the only tests it contains are unit tests in their simplest form. No complex data setup or external services are required; each test class is entirely self-contained. This makes testing in this project significantly different from testing a typical industry application. As a result, when considering potential targets for Synthesized Custodian, it is important to note that this project is not fully representative of real-world systems, which often involve complex integration, stateful environments, and external dependencies.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_experiment_idea"><a class="anchor" href="#_experiment_idea"></a>Experiment idea</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The core idea was simple: use an LLM-based agent to hunt for bugs by reasoning over documentation, implementation, and existing tests.</p>
+</div>
+<div class="paragraph">
+<p>Only public methods were analysed, as this was the only category for which it was technically possible to write external test code. In retrospect, I also realised that deprecated classes and methods should have been excluded from the analysis. Doing so would have reduced the overall scope of the experiment and the amount of manual review required.</p>
+</div>
+<div class="paragraph">
+<p>For each public method, the agent was provided with:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The method’s Javadoc (expected behaviour)</p>
+</li>
+<li>
+<p>The method implementation.</p>
+</li>
+<li>
+<p>The implementation of tests that already cover this method.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The prompt for the LLM was to think of potential bugs based on what it sees and to propose additional high-value tests that could reveal inconsistencies or bugs.</p>
+</div>
+<div class="paragraph">
+<p>In this experiment, we provided the LLM with only the method body itself, without any recursive expansion into called subroutines. Since many methods in this library merely delegate to other methods, the model often saw only three or four lines of code that revealed little about the actual implementation. For other methods, however, the full implementation was visible and available for analysis.</p>
+</div>
+<div class="paragraph">
+<p>How much implementation code should be exposed to the LLM remains an open question. It seems likely that the results of this experiment could have been improved by applying heuristics that selectively include additional subroutine code when the analysed method is short or consists solely of delegation. The challenge is to do so without introducing excessive  irrelevant details that could confuse the model. On the other hand, in real-world industrial settings, source code is not always available. In such cases, a testing agent must be capable of identifying bugs even when the implementation is hidden.</p>
+</div>
+<div class="paragraph">
+<p>A particurlarly unique feature of this experiment was the inclusion of the existing test code that covers each method under analysis. The intention was to help the agent focus on untested (or tested but undocumented) behaviour. The prompt explicitly stated that the existing tests were passing, thereby providing the LLM with reliable information about the method’s current, accepted behaviour.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_worflow_structure_and_implementation"><a class="anchor" href="#_worflow_structure_and_implementation"></a>Worflow structure and implementation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Thus the critical prerequisite was precise impact analysis. I did the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>run every test in the project under JaCoCo (<a href="https://github.com/jacoco/jacoco" class="bare">https://github.com/jacoco/jacoco</a>)</p>
+</li>
+<li>
+<p>collect the set of methods covered by each test separately (used JUnit5 extension to reset the JaCoCo state before each test)</p>
+</li>
+<li>
+<p>inverted the mapping, obtating for each method the list of tests covering it</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The resulting intermediate artifact looked like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">"AnnotationUtils#annotationArrayMemberEquals(Annotation[], Annotation[]):boolean":
+  - "AnnotationUtilsTest#testEquivalence()"
+  - "AnnotationUtilsTest#testNonEquivalentAnnotationsOfSameType()"
+"AnnotationUtils#arrayMemberEquals(Class, Object, Object):boolean":
+  - "AnnotationUtilsTest#testEquivalence()"
+  - "AnnotationUtilsTest#testNonEquivalentAnnotationsOfSameType()"
+"AnnotationUtils#arrayMemberHash(Class, Object):int":
+  - "AnnotationUtilsTest#testHashCode()"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I used JavaParser (<a href="https://github.com/javaparser/javaparser" class="bare">https://github.com/javaparser/javaparser</a>) to navigate the code repository and extract corresponding source snippets and Javadoc.</p>
+</div>
+<div class="paragraph">
+<p>These were provided as the input to the following agentic workflow:</p>
+</div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/graphviz/svg/eNqFUc1uwjAMvvMUVs_tYcANlcMmjRua0HaiHExi2ojUqZzANE1796Vpw4672fL3Z1ubVnDoYAffCwBBvmoj9fvzJnbsNB19hwPVQiogt5ZKH75s7N2NNenTCNs_HS2eydbFm9CAQqCd8oCsQUUF8GyGgYIvJvQyoz-84TZhSzD9QJZ64oDBOG54ZAfyIc4-xQSKcoBam3GKtuHOtF11R3ujBCtOKUi13S8nk7HKRi-uH4xNwkAiThq-EOkzqmtRKmedxP3mXVaZdLjxFGCOvc6DVydAqDqInIQoG-7xGhPCnUQbFfKiMcNqEo3VelJJuR6e0Z19EDQc6gtan8-r0XdxOjuGjrI0GA_BRetq2noU3QkRz39SRtTjSRdjbfIY3doRlRXnhDFXIo_NgfS_GvKXKV-l2kbiZvHzC8wCw9c=" alt="The agentic workflow">
+</div>
+<div class="title">Figure 2. The agentic workflow</div>
+</div>
+<div class="paragraph">
+<p>This workflow builds on ideas that we had already applied in previous experiments. The central step is the generation of an “additional high-value test”, intended to reproduce a bug that the agent is attempting to uncover. If the generated test failed to compile, the compilation error was immediately fed back to the LLM, which was then asked to fix the code. This process was repeated for up to five iterations.</p>
+</div>
+<div class="paragraph">
+<p>Although exact statistics were not recorded, the subjective observation was that, in the majority of cases, the generated code compiled successfully after a single iteration. The number of cases requiring N iterations appeared to decrease rapidly as N increased. Nevertheless, there was a small but non-zero fraction of cases in which the LLM failed to produce compilable code even after five retries.</p>
+</div>
+<div class="paragraph">
+<p>In the next step, the generated tests were executed. If a test passed, no further action was taken and the outcome was recorded as “the agent failed to find interesting behaviour.” In principle, the agent could have been instructed to continue exploring the method in such cases; however, due to time constraints, this was not implemented.</p>
+</div>
+<div class="paragraph">
+<p>If a test failed, the LLM was asked to produce a verdict. Based on the available context, including the generated test code, the failure location, the stack trace, and assertion failure details, the agent had to decide whether the failure indicated a genuine deficiency in the library or whether additional information was required and the test should be regenerated. Again, due to limited time, the feedback loop for test regeneration was not implemented. Instead, the analysis focused exclusively on artefacts that were classified as genuine bugs during the first pass of the workflow.</p>
+</div>
+<div class="paragraph">
+<p>The experiment produced the following results:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Impact analysis combined with JavaParser identified 2,821 public methods.</p>
+</li>
+<li>
+<p>2,120 generated “additional high-value tests” passed successfully, and no further action was taken.</p>
+</li>
+<li>
+<p>442 cases were classified with a “bug identified” verdict.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All 442 reports were manually reviewed. While <strong>most</strong> of them turned out to be noise or false positives, several findings were genuinely impressive. The remainder of this report focuses on these useful findings, as well as on examples of cases where the system failed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_useful_findings"><a class="anchor" href="#_useful_findings"></a>Useful findings</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_documentation_behaviour_discrepancies"><a class="anchor" href="#_documentation_behaviour_discrepancies"></a>Documentation-behaviour discrepancies</h3>
+<div class="paragraph">
+<p>Perhaps the most illustrative example is a documentation–behaviour discrepancy found in the following method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+ * Gets a hash code for an array handling multidimensional arrays correctly.
+[...]
+ * @param array  the array to get a hash code for, {@code null} returns zero.
+ * @return a hash code for the array.
+ */
+public static int hashCode(final Object array)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A review of the existing tests shows that the method’s ability to compute hash codes for multidimensional arrays is thoroughly tested. However, the following seemingly trivial test fails:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+void testNullArrayHashCode() {
+  // According to javadoc: "null returns zero"
+  assertEquals(0, ArrayUtils.hashCode(null));
+  //Fail, actual result 629
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Further investigation revealed that the “null returns zero” promise was introduced as part of a broader Javadoc update that documented null-handling behaviour across multiple methods. At the time of that commit — and, remarkably, for the 23 years that followed — no test verified that this promise actually held for <code>ArrayUtils.hashCode</code>. It was only when the AI agent generated and executed this test that the discrepancy was discovered.</p>
+</div>
+<div class="paragraph">
+<p>Notably, <code>ArrayUtils.hashCode</code> itself is just a delegation to underlying hash-calculation utilities. As a result, the LLM did not see the actual implementation logic. Instead, it simply validated the contract stated in the Javadoc and found that the implementation did not uphold it.</p>
+</div>
+<div class="paragraph">
+<p>This issue was reported as <a href="https://issues.apache.org/jira/browse/LANG-1813" class="bare">https://issues.apache.org/jira/browse/LANG-1813</a>, and there is ongoing discussion as to whether it should be treated as a bug in the implementation or as an error in the documentation.</p>
+</div>
+<div class="paragraph">
+<p>A similar issue was identified in the following method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">/**
+ * Creates a range with the specified minimum and maximum values (both inclusive).
+ *
+[....]
+ * @throws IllegalArgumentException if either element is null.
+ */
+public static DoubleRange of(final Double fromInclusive, final Double toInclusive)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The agent explicitly verified the type of exception thrown when either argument is <code>null</code> and determined that the method actually throws a <code>NullPointerException</code>, which aligns with Java best practices, rather than the documented <code>IllegalArgumentException</code>.</p>
+</div>
+<div class="paragraph">
+<p>A fix was proposed in <a href="https://github.com/apache/commons-lang/pull/1581" class="bare">https://github.com/apache/commons-lang/pull/1581</a>
+ and was merged promptly. Following this change, several similar cases where <code>IllegalArgumentException</code> was documented instead of <code>NullPointerException</code> were identified and corrected across the codebase.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_static_analysis_like_findings"><a class="anchor" href="#_static_analysis_like_findings"></a>Static-analysis like findings</h3>
+<div class="paragraph">
+<p>The following two findings could, in principle, have been detected by static analysis tools. However, doing so would require fairly sophisticated analysis: these cases lie on the boundary between simple mechanical parsing of code and genuine understanding of its behaviour. In both instances, executing the code was unnecessary—it was sufficient to carefully read and reason about it to identify the deficiencies.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">final class UncheckedFutureImpl&lt;V&gt;  [...]
+
+    @Override
+    public V get() {
+        try {
+            return super.get();
+        } catch (final InterruptedException e) {
+            throw new UncheckedInterruptedException(e); <i class="conum" data-value="1"></i><b>(1)</b>
+        } catch (final ExecutionException e) {
+            throw new UncheckedExecutionException(e);
+        }
+    }</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Thread.currentThread().interrupt();</code> is missing, which breaks the cooperative interruption mechanism.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When wrapping <code>InterruptedException</code>, the interrupt status should be restored:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+    throw new UncheckedInterruptedException(e);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is a well-known and widely recommended pattern. It is explicitly described inin Java Concurrency in Practice (Brian Goetz et al.) and appears in commonly used concurrency code review checklists (see <a href="https://github.com/code-review-checklists/java-concurrency?tab=readme-ov-file#restore-interruption" class="bare">https://github.com/code-review-checklists/java-concurrency?tab=readme-ov-file#restore-interruption</a>).</p>
+</div>
+<div class="paragraph">
+<p>This issue was reported as <a href="https://issues.apache.org/jira/browse/LANG-1817" class="bare">https://issues.apache.org/jira/browse/LANG-1817</a></p>
+</div>
+<div class="paragraph">
+<p>Another example is even simpler, but still requires careful reading and understanding of the code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">if (startIndex &lt; 0 || startIndex &gt; chars.length) {
+    throw new StringIndexOutOfBoundsException("Invalid startIndex: " + length); <i class="conum" data-value="1"></i><b>(1)</b>
+}
+if (length &lt; 0 || startIndex + length &gt; chars.length) {
+    throw new StringIndexOutOfBoundsException("Invalid length: " + length);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is a copy-and-paste error: the exception message should reference <code>startIndex</code>, not <code>length</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Interestingly, this copy-and-paste error was apparently repeatedly propagated: it was copied from the deprecated <code>StrBuilder</code> class into the separate <code>commons-text</code> library, and later into the currently supported <code>TextStringBuilder</code>. As a result, the same mistake appeared in three different Apache Commons libraries and persisted there for decades.</p>
+</div>
+<div class="paragraph">
+<p>The issue is reported as <a href="https://issues.apache.org/jira/browse/TEXT-239" class="bare">https://issues.apache.org/jira/browse/TEXT-239</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_floating_point_edge_case"><a class="anchor" href="#_floating_point_edge_case"></a>Floating-point edge-case</h3>
+<div class="paragraph">
+<p>When working with <code>double</code> values, special cases such as <code>NaN</code> and infinities are often overlooked—but not by the AI agent. An issue reported as <a href="https://issues.apache.org/jira/browse/LANG-1816" class="bare">https://issues.apache.org/jira/browse/LANG-1816</a>
+ revealed an inconsistency in a family of methods that search for values in arrays of doubles:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">final double[] a = {1, Double.NaN, 3};
+// Works (non-tolerance path handles NaN explicitly)
+assertEquals(1, ArrayUtils.indexOf(a, Double.NaN));
+// Fails (tolerance path "forgets" about NaN)
+assertEquals(1, ArrayUtils.indexOf(a, Double.NaN, 0.0));
+// Also fail
+assertTrue(ArrayUtils.contains(a, Double.NaN, 0.0));
+assertTrue(ArrayUtils.indexesOf(a, Double.NaN, 0, 0.0).get(1));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It turned out that the overloaded variants of these methods that accept a tolerance parameter omitted the special-case handling for <code>NaN</code>, while the corresponding variants without a tolerance parameter behaved correctly. As a result, logically equivalent operations produced inconsistent results depending solely on which overload was used.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_class_name_parser_misinterpreting_in_legitimate_class_names"><a class="anchor" href="#_class_name_parser_misinterpreting_in_legitimate_class_names"></a>Class name parser misinterpreting $ in legitimate class names</h3>
+<div class="paragraph">
+<p>The purpose of the <code>ClassUtils.getShortClassName(..)</code> family of methods is to return a class name without its package prefix. The main challenge is that, when given only a JVM binary name in <code>String</code> form (as returned by <code>Class.getName()</code>), it is not always possible to distinguish between a $ used as an inner-class separator and a $ that is legitimately part of a  class name.</p>
+</div>
+<div class="paragraph">
+<p>For example, <code>a.b.Outer$Inner</code> may refer either to the inner class <code>Outer.Inner</code> or to a top-level class named <code>Outer$Inner</code>. The existing implementation attempted to resolve this ambiguity by parsing the output of <code>Class.getName()</code> using heuristics.</p>
+</div>
+<div class="paragraph">
+<p>The AI agent identified several edge cases where these heuristics failed. As a result, the proposed solution in <a href="https://issues.apache.org/jira/browse/LANG-1818" class="bare">https://issues.apache.org/jira/browse/LANG-1818</a>
+ is to reimplement <code>getShortClassName(Class)</code> using reliable and unambiguous metadata available on the <code>Class</code> object itself, rather than attempting to interpret an inherently ambiguous string representation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_integer_arithmetic_overflows"><a class="anchor" href="#_integer_arithmetic_overflows"></a>Integer arithmetic overflows</h3>
+<div class="paragraph">
+<p>When the results of integer arithmetic are used as array indices, negligence toward possible overflows can lead to serious bugs.</p>
+</div>
+<div class="paragraph">
+<p>The AI agent identified a significant issue in <code>ArrayUtils.subarray(int[] array, int startIndexInclusive, int endIndexExclusive)</code> (and the corresponding overloads for all the other array types).</p>
+</div>
+<div class="paragraph">
+<p>According to the documentation, these methods should return an empty array when <code>endIndexExclusive &lt; startIndexInclusive</code>. However, for certain combinations of indices, this contract is violated due to integer overflow during index arithmetic.</p>
+</div>
+<div class="paragraph">
+<p>The problem lies in the computation of the new array size:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">startIndexInclusive = max0(startIndexInclusive);
+endIndexExclusive = Math.min(endIndexExclusive, array.length);
+final int newSize = endIndexExclusive - startIndexInclusive;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The final subtraction may overflow, turning a logically negative size into a positive value. As a result, the method attempts to allocate and/or copy an array instead of returning an empty result. Depending on the overflowed value and available heap size, this leads to either <code>ArrayIndexOutOfBoundsException</code>  or <code>OutOfMemoryError</code> instead of simply returning an empty array.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@ParameterizedTest
+@CsvSource({
+        // Normal operation
+        "2, 1",
+        // Overflowed to newSize == 1 (AIOOBE)
+        "2147483647, -2147483648",
+        // Overflowed to a large positive newSize (OOME)
+        "2000000000, -2000000000"
+})
+void testNegativeEndAndHugeStartDoesNotOverflow(int startIndexInclusive, int endIndexExclusive) {
+    int[] array = \{1, 2, 3};
+    int[] result = ArrayUtils.subarray(array, startIndexInclusive, endIndexExclusive);
+    assertEquals(0, result.length);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Interestingly, as a side effect of this investigation, the same issue was found to exist in the analogous method <code>java.util.Arrays.copyOfRange</code> in the Java standard library. This was reported to the core-libs-dev mailing list (see <a href="https://mail.openjdk.org/pipermail/core-libs-dev/2026-January/158103.html" class="bare">https://mail.openjdk.org/pipermail/core-libs-dev/2026-January/158103.html</a>)</p>
+</div>
+<div class="paragraph">
+<p>Another successful identification of an integer overflow issue involved the deprecated <code>StrBuilder</code> class. In this case, the following code does not attempt to allocate a large buffer, but instead results in an <code>ArrayIndexOutOfBoundsException</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">StrBuilder sb = new StrBuilder();
+sb.append("x"); // size = 1
+
+// This causes integer overflow: 1 + Integer.MAX_VALUE = -2147483648
+// ensureCapacity receives negative value, does not expand the buffer
+// Then the loop tries to write Integer.MAX_VALUE characters
+sb.appendPadding(Integer.MAX_VALUE, 'a');</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No issue was filed, as <code>StrBuilder</code> is deprecated. Notably, the newer <code>org.apache.commons.text.TextStringBuilder</code> explicitly guards against integer overflows and handles such cases correctly.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deep_semantic_bug_annotation_equality"><a class="anchor" href="#_deep_semantic_bug_annotation_equality"></a>Deep semantic bug: annotation equality</h3>
+<div class="paragraph">
+<p>The agent identified a genuinely non-trivial bug: <code>AnnotationUtils.equals</code> always returns false for package-private annotations.</p>
+</div>
+<div class="paragraph">
+<p>A simple custom test reliably demonstrated the issue:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class AnnotationEqualsTest {
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Tag {
+        String value();
+    }
+
+    @Tag("value")
+    private final Object a = new Object();
+    @Tag("value")
+    private final Object b = new Object();
+
+    @Test
+    void equalsWorksOnPackagePrivateAnnotations() throws Exception {
+        Tag tagA = getClass().getDeclaredField("a").getAnnotation(Tag.class);
+        Tag tagB = getClass().getDeclaredField("b").getAnnotation(Tag.class);
+
+        // Expected true; returns false because a reflective access exception is swallowed.
+        Assertions.assertTrue(AnnotationUtils.equals(tagA, tagB));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Internally, Commons Lang relies on reflection to retrieve and compare annotation members. Two issues combined to produce the incorrect behaviour:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Before invoking annotation members, the code failed to call <code>setAccessible(true)</code>, which led to a <code>ReflectiveOperationException</code>.</p>
+</li>
+<li>
+<p>The exception itself was handled in a problematic way:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">} catch (final ReflectiveOperationException ex) {
+    return false;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, the exception is silently swallowed and <code>false</code> is returned, masking the underlying problem.</p>
+</div>
+<div class="paragraph">
+<p>This issue was reported as <a href="https://issues.apache.org/jira/browse/LANG-1815" class="bare">https://issues.apache.org/jira/browse/LANG-1815</a>
+ and represents one of the strongest successes of the experiment.</p>
+</div>
+<div class="paragraph">
+<p>Identifying this bug required understanding Java reflection and reasoning across multiple lines of code, and in this case, the agent demonstrated allthese capabilities effectively.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_failures_and_hallucinations"><a class="anchor" href="#_failures_and_hallucinations"></a>Failures and hallucinations</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_a_classic_off_by_one_error"><a class="anchor" href="#_a_classic_off_by_one_error"></a>"A classic off-by-one error"</h3>
+<div class="paragraph">
+<p>While the experiment demonstrated several successful bug discoveries—resulting in approximately ten filed issues or pull requests—the remaining ~400 artefacts were significantly less useful.</p>
+</div>
+<div class="paragraph">
+<p>When asked to produce a verdict, the LLM could be highly assertive in its language:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+The test has reliably identified a bug in the implementation&#8230;&#8203; This is a classic off-by-one error that occurs when removing multiple elements from an array.
+</blockquote>
+</div>
+<div class="paragraph">
+<p>In this case, the agent claimed to have found a serious defect in the following method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">long[] removeAllOccurrences(final long[] array, final long element)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, closer inspection of the proposed “reproducer” test revealed that the off-by-one error was introduced by the LLM itself:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">int size = 100; long[] array = new long[size];
+int expectedRemaining = 0;
+for (int i = 0; i &lt; size; i++) {
+    if (i % 3 == 0) { array[i] = 7L; }
+    else {
+        array[i] = i;
+        expectedRemaining++; <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+}
+long[] result = ArrayUtils.removeAllOccurrences(array, 7L);
+assertEquals(expectedRemaining, result.length);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Should not increment when <code>i == 7L</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This example illustrates a recurring failure mode: while the agent is capable of identifying real defects, it can also introduce bugs of its own and present them with a high degree of confidence.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_error_in_step_by_step_algorithm_tracking"><a class="anchor" href="#_error_in_step_by_step_algorithm_tracking"></a>Error in step-by-step algorithm tracking</h3>
+<div class="paragraph">
+<p>In some cases, the LLM failed to correctly track algorithmic state across multiple operations.</p>
+</div>
+<div class="paragraph">
+<p>In the example below, the model claimed that consecutive deletions on a StrBuilder do not correctly update its internal state and proposed the following "reproducer":</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+void testMultipleConsecutiveDeletes() {
+    StrBuilder sb = new StrBuilder("abcdefgh");
+    sb.delete(1, 2).delete(1, 2).delete(1, 2);
+    assertEquals("afgh", sb.toString(),
+            "Multiple consecutive deletes should work correctly");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It justified this expectation with the following step-by-step reasoning (note step 4):</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Starting with: `"abcdefgh"`_</p>
+</li>
+<li>
+<p>After <code>delete(1, 2)</code>: should be <code>"acdefgh"</code> (removed 'b')</p>
+</li>
+<li>
+<p>After <code>delete(1, 2)</code>: should be <code>"adefgh"</code> (removed 'c')</p>
+</li>
+<li>
+<p>After <code>delete(1, 2)</code>: should be <code>"afgh"</code> (removed 'd') &#8592; incorrect</p>
+</li>
+<li>
+<p><strong>Expected</strong>: <code>"afgh"</code>, <strong>actual</strong>: <code>"aefgh"</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The LLM lost track of the shifting indices and incorrectly concluded that the character 'e' should also be removed. This example highlights a common hallucination pattern: while the agent can generate plausible step-by-step explanations, it may still make subtle but critical mistakes in tracking mutable state across sequential operations.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_errors_in_reasoning"><a class="anchor" href="#_errors_in_reasoning"></a>Errors in reasoning</h3>
+<div class="paragraph">
+<p>In this example, the LLM claimed to have found a bug because <code>ClassUtils.isAssignable(Integer[].class, Number[].class)</code> returned true. Its reasoning was as follows:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+In Java, while Integer is assignable to Number, arrays are <strong>invariant</strong> for assignment purposes&#8230;&#8203; While Java arrays are <strong>covariant</strong> at the type system level (it compiles), the question "is assignable" in the context of this method should respect that array assignment has stricter rules than simple reference assignment&#8230;&#8203;
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Here, the model conflated two different concepts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Assignability of arrays as whole objects — Java arrays are covariant, so <code>Integer[]</code> is assignable to <code>Number[]</code>.</p>
+</li>
+<li>
+<p>Assignability of array elements — unsafe element assignments are prevented at runtime via <code>ArrayStoreException</code>, not at compile time.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Since <code>ClassUtils.isAssignable(..)</code> is concerned with type assignability (i.e., whether a reference of one type can be assigned to another), the correct result for <code>Integer[].class → Number[].class</code> is <code>true</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pure_hallucination"><a class="anchor" href="#_pure_hallucination"></a>Pure hallucination</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Test
+void testCaseSensitivityBug() {
+    // This should be false because 'HeLLo' ends with 'LLo', not 'Lo'
+    assertFalse(StringUtils.endsWith("HeLLo", "Lo"),
+            "endsWith should be case-sensitive: 'HeLLo' does not end with 'Lo'");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I don&#8217;t know how to comment this one.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusions"><a class="anchor" href="#_conclusions"></a>Conclusions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>Yes</strong>, our agentic system does produce highly valuable results that are difficult to achieve through static analysis tools or traditional human code review alone. However:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Effective use of the system requires substantial project-specific customisation, which in turn demands significant human effort (albeit often AI-assisted).</p>
+</li>
+<li>
+<p>The high-value findings are diluted by a large amount of noise and hallucinations, making careful human review indispensable.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In summary, the system functions best not as an autonomous bug finder, but as a powerful amplifier of human expertise — capable of uncovering subtle, deep issues when embedded in a well-designed, human-in-the-loop workflow.</p>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

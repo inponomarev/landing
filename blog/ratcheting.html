@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Ivan Ponomarev, PhD | Lecturer & tutor in Software Engineering with solid practical background</title>
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+    <link rel="stylesheet" href="../_/css/add.css"><script src="https://kit.fontawesome.com/7cc9d3cef1.js" crossorigin="anonymous"></script>
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item"><a href="/">Ivan Ponomarev, Ph.D.</a></div>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="https://www.linkedin.com/in/inponomarev/">
+                <i class="fa-brands fa-linkedin fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://www.youtube.com/@inponomarev">
+                <i class="fa-brands fa-youtube fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/inponomarev">
+                <i class="fa-brands fa-github fa-fw"></i>
+            </a>
+            <a class="navbar-item" href="https://twitter.com/inponomarev">
+                <i class="fa-brands fa-twitter fa-fw"></i>
+            </a>
+            <div class="navbar-item"></div>
+            <a class="navbar-item" href="/blog">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+        </div>
+    </nav>
+</header>
+
+<div class="body">
+<main class="article">
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Introduce Static Analysis in the Process, Don&#8217;t Just Search for Bugs With It</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>This article is an authorized translation of <a href="https://habr.com/ru/post/436868/">my post in Russian</a>. The translation was made with the kind help of the guys from PVS-Studio.</em></p>
+</div>
+<div class="paragraph">
+<p>What encouraged me to write this article is a considerable quantity of materials on static analysis, which recently has been increasingly coming up. Firstly, this is a <a href="https://habr.com/en/company/pvs-studio/blog/">blog of PVS-Studio</a>, which actively promotes itself posting reviews of errors found by their tool in open source projects. PVS-Studio has recently implemented <a href="https://habr.com/en/company/pvs-studio/blog/436496/">Java support</a>, and, of course, developers from IntelliJ IDEA, whose built-in analyzer is probably the most advanced for Java today, <a href="https://habr.com/ru/company/jetbrains/blog/436278/">could not stay away</a>.</p>
+</div>
+<div class="paragraph">
+<p>When reading these reviews, I get a feeling that we are talking about a magic elixir: click the button, and here it is — the list of defects right in front of your eyes. It seems that as analyzers get more advanced, more and more bugs will be found, and products, scanned by these robots, will become better and better without any effort on our part.</p>
+</div>
+<div class="paragraph">
+<p>But there are no magic elixirs. I would like to talk about what is usually not spoken in posts like: what analyzers are not able to do, what&#8217;s their real part and place in the process of software delivery, and how to implement the analysis properly.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ratchet.png" alt="ratchet" width="50%">
+</div>
+<div class="title">Figure 1. Ratchet (source: <a href="https://ru.wikipedia.org/wiki/%D0%A5%D1%80%D0%B0%D0%BF%D0%BE%D0%B2%D0%BE%D0%B9_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC#/media/File:Sperrklinke_Schema.svg">Wikipedia</a>)</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_static_analyzers_will_never_be_able_to_do"><a class="anchor" href="#_what_static_analyzers_will_never_be_able_to_do"></a>What Static Analyzers Will Never Be Able to Do</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>What is the analysis of source code from the practical point of view? We take the source files and get some information about the system quality in a short time (much shorter than a tests run). Principal and mathematically insurmountable limitations are that this way we can answer only a very limited subset of questions about the analyzed system.</p>
+</div>
+<div class="paragraph">
+<p>The most famous example of a task not solvable using static analysis is a <a href="https://en.wikipedia.org/wiki/Halting_problem">halting problem</a>: this is a theorem, which proves that one cannot work out a general algorithm which would define whether a program with a given source code will loop forever or be completed for the final time. The extension of this theorem is <a href="https://en.wikipedia.org/wiki/Rice%27s_theorem">Rice&#8217;s theorem</a>, asserting that for any non-trivial property of computable functions, the question of determination of whether a given program calculates a function with this property is an algorithmically unsolvable task. For example, you cannot write an analyzer, which determines based on source code if the analyzed program is an implementation of a specific algorithm, say, one that computes squaring an integer number.</p>
+</div>
+<div class="paragraph">
+<p>Thus, the functionality of static analyzers has insurmountable limitations. Static analyzer will never be able to detect all the cases of, for example, null pointer exception bugs in languages without the <a href="https://en.wikipedia.org/wiki/Void_safety">void safety</a>. Or detect all the occurrences of «attribute not found» in dynamically typed languages. All that the most perfect static analyzer can do is to catch particular cases. The number of them among all possible problems with your source code, without exaggeration, is a drop in the ocean.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_static_analysis_is_not_a_search_for_bugs"><a class="anchor" href="#_static_analysis_is_not_a_search_for_bugs"></a>Static Analysis Is Not a Search for Bugs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here is a conclusion that follows from the above statement: static analysis is not the way to decrease the number of defects in a program. I would venture to claim the following: being first applied to your project, it will find <em>unusual</em> places in the code, but most likely will not find any defects that affect the quality of your program.</p>
+</div>
+<div class="paragraph">
+<p>Examples of defects automatically found by analyzers are impressive, but we should not forget that these examples were found by scanning a huge set of code bases against the set of relatively simple rules. In the same way hackers, having the opportunity to try several simple passwords on a large number of accounts, eventually find the accounts with a simple password.</p>
+</div>
+<div class="paragraph">
+<p>Does this mean that it is not necessary to apply static analysis? Of course not! It should be applied for the same reason you might want to verify every new password in the stop-list of non-secure passwords.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_static_analysis_is_more_than_a_search_for_bugs"><a class="anchor" href="#_static_analysis_is_more_than_a_search_for_bugs"></a>Static Analysis Is More Than a Search for Bugs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In fact, the tasks that can be solved by the analysis in practice are much wider. Because generally speaking, static analysis represents any check of source code, carried out before running it. Here are some things you can do:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A check of the coding style in the broadest sense of this word. It includes both a check of formatting and a search of empty/unnecessary parentheses usage, the setting of threshold values for metrics such as a number of lines/cyclomatic complexity of a method and so on — all things that complicate the readability and maintainability of code. In Java, Checkstyle represents a tool with such functionality, in Python — <code>flake8</code>. Such programs are usually called linters.</p>
+</li>
+<li>
+<p>Not just executable code can be analyzed. Resources like JSON, YAML, XML, and <code>.properties</code> files can (and must!) be automatically checked for validity. The reason for it is that it&#8217;s better to find out the fact that, say, the JSON structure is broken because of the unpaired quotes at the early stage of the automated check of a pull request than during tests execution or in run time, isn&#8217;t it? There are some relevant tools, for example, <a href="https://github.com/adrienverge/yamllint">YAMLlint</a>, <a href="https://github.com/zaach/jsonlint">JSONLint</a> and <code>xmllint</code>.</p>
+</li>
+<li>
+<p>Compilation (or parsing for dynamic programming languages) is also a kind of static analysis. Usually, compilers can issue warnings that signal problems with the quality of the source code, and they should not be ignored.</p>
+</li>
+<li>
+<p>Sometimes compilation is applied not only to executable code. For example, if you have documentation in the <a href="https://asciidoctor.org/">AsciiDoctor</a> format, then in the process of compiling it into HTML/PDF, the AsciiDoctor (<a href="https://github.com/asciidoctor/asciidoctor-maven-plugin">Maven plugin</a>) can issue warnings, for example, on broken internal links. This is a significant reason not to accept a pull request with documentation changes.</p>
+</li>
+<li>
+<p>Spell checking is also a kind of static analysis. The <a href="http://aspell.net/">aspell</a> utility is able to check spelling not only in the documentation, but also in the source code of programs (comments and literals) in various programming languages including C/C++, Java and Python. Spelling errors in the user interface or documentation are also a defect!</p>
+</li>
+<li>
+<p>Configuration tests actually represent a form of static analysis, as they don&#8217;t execute source code during the process of their execution, even though configuration tests are executed as <code>pytest</code> unit tests.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>As we can see, the search of bugs has the least significant role in this list and everything else is available when using free open source tools.</p>
+</div>
+<div class="paragraph">
+<p>Which of these static analysis types should be used in your project? Sure, the more the better! What is important here is a proper implementation, which will be discussed further.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_a_delivery_pipeline_as_a_multistage_filter_and_static_analysis_as_its_first_stage"><a class="anchor" href="#_a_delivery_pipeline_as_a_multistage_filter_and_static_analysis_as_its_first_stage"></a>A Delivery Pipeline As a Multistage Filter and Static Analysis As Its First Stage</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A pipeline with a flow of changes (starting from changes of the source code to delivery in production) is a classic metaphor of continuous integration. The standard sequence of stages of this pipeline looks as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Static analysis</p>
+</li>
+<li>
+<p>Compilation</p>
+</li>
+<li>
+<p>Unit tests</p>
+</li>
+<li>
+<p>Integration tests</p>
+</li>
+<li>
+<p>UI tests</p>
+</li>
+<li>
+<p>Manual verification</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Changes rejected at the N-th stage of the pipeline are not passed on stage N+1.</p>
+</div>
+<div class="paragraph">
+<p>Why so and not otherwise? In the part of the pipeline which deals with testing, testers recognize the well-known test pyramid:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/test_pyramid.png" alt="test pyramid" width="50%">
+</div>
+<div class="title">Figure 2. Test pyramid. Source: <a href="https://martinfowler.com/bliki/TestPyramid.html">the article</a> by Martin Fowler.</div>
+</div>
+<div class="paragraph">
+<p>At the bottom of this pyramid, there are tests that are easier to write, which are executed faster and don&#8217;t tend to produce false positives. Therefore, there should be more of them, they should cover most of the code, and should be executed first. At the top of the pyramid, the situation is quite the opposite, so the number of integration and UI tests should be reduced to the necessary minimum. People in this chain are the most expensive, slow, and unreliable resource, so they are located at the very end and do the work only if the previous steps haven&#8217;t detected any defects. In the parts not related to testing, the pipeline is built by the same principles!</p>
+</div>
+<div class="paragraph">
+<p>I&#8217;d like to suggest the analogy in the form of a multistage system of water filtration. Dirty water (changes with defects) is supplied in the input, and as the output we need to get clean water, which won&#8217;t contain all unwanted contaminations.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/water_filter.jpeg" alt="water filter" width="60%">
+</div>
+<div class="title">Figure 3. Multi-stage filter. Source: <a href="https://commons.wikimedia.org/wiki/File:Milli-Q_Water_filtration_station.JPG">Wikimedia Commons</a></div>
+</div>
+<div class="paragraph">
+<p>As you may know, purification filters are designed so that each subsequent stage is able to remove contaminant particles of smaller size. Input stages of rough purification have greater throughput and lower cost. In our analogy, it means that input quality gates have greater performance, require less effort to launch, and have less operating costs. The role of static analysis, which (as we now understand) is able to weed out only the most serious defects, is the role of the sump filter as the first stage of the multi-stage purifiers.</p>
+</div>
+<div class="paragraph">
+<p>Static analysis doesn&#8217;t improve the quality of the final product by itself, the same as the sump doesn&#8217;t make the water potable. Yet in conjunction with other pipeline elements, its importance is obvious. Even though in a multistage filter the output stages potentially can remove everything the input ones can, we&#8217;re aware of consequences that will follow when attempting to get by only with stages of fine purification, without input stages.</p>
+</div>
+<div class="paragraph">
+<p>The purpose of the sump is to offload subsequent stages from the capture of very rough defects. For example, a person performing code review should not be distracted by incorrectly formatted code and code standards violation (like redundant parentheses or branching nested too deeply). Bugs like NPE should be caught by the unit tests, but if before that the analyzer indicates that a bug is to appear inevitably — this will significantly accelerate its fixing.</p>
+</div>
+<div class="paragraph">
+<p>I suppose it is now clear why static analysis doesn&#8217;t improve the quality of the product when applied occasionally, and must be applied continuously to filter changes with serious defects. The question of whether the application of a static analyzer improves the quality of your product is roughly equivalent to the question, "If we take water from dirty ponds, will its drinking quality be improved when we pass it through a colander?"</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction_in_a_legacy_project"><a class="anchor" href="#_introduction_in_a_legacy_project"></a>Introduction in a Legacy Project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An important practical issue: how do we implement static analysis in the continuous integration process as a quality gate? In the case of automated tests, it is clear: there is a set of tests, and a failure of any of them is a sufficient reason to believe that a build hasn&#8217;t passed a quality gate. An attempt to set a gate in the same way by the results of static analysis fails: there are too many analysis warnings on legacy code, you don&#8217;t want to ignore them all. On the other hand, it&#8217;s impossible to stop the product delivery just because there are analyzer warnings in it.</p>
+</div>
+<div class="paragraph">
+<p>For any project, the analyzer issues a great number of warnings being applied in the first time. The majority of warnings have nothing to do with the the proper functioning of the product. It will be impossible to fix all of them and many of them don&#8217;t have to be fixed at all. In the end, we know that our product actually works even before the introduction of static analysis!</p>
+</div>
+<div class="paragraph">
+<p>As a result, many developers confine themselves to the occasional usage of static analysis or using it only in the informative mode which involves getting an analyzer report when building a project. This is equivalent to the absence of any analysis, because if we already have many warnings, the emergence of another one (however serious) remains unnoticed when changing the code.</p>
+</div>
+<div class="paragraph">
+<p>Here are the known ways of quality gates introduction:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Setting the limit of the total number of warnings or the number of warnings, divided by the number of lines of code. It works poorly, as such a gate lets changes with new defects through until their limit is exceeded.</p>
+</li>
+<li>
+<p>Marking of all of the old warnings in the code as ignored in a certain moment and build failure when new warnings appear. Such functionality can be provided by PVS-Studio and some other tools, for example, Codacy. I haven&#8217;t happened to work with PVS-Studio. As for my experience with Codacy, their main problem is that the distinction of an old and a new error is a complicated and not always working algorithm, especially if files change considerably or get renamed. To my knowledge, Codacy could overlook new warnings in a pull request and at the same time impede a pull request due to warnings, not related to changes in the code of this PR.</p>
+</li>
+<li>
+<p>In my opinion, the most effective solution is the racheting method described in the "<a href="https://www.amazon.com/Continuous-Delivery-Deployment-Automation-Addison-Wesley/dp/0321601912">Continuous Delivery</a>" book. The basic idea is that the number of static analysis warnings is a property of each release and only such changes are allowed, which don&#8217;t increase the total number of warnings.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ratchet"><a class="anchor" href="#_ratchet"></a>Ratchet</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It works in the following way:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>In the initial phase, an entry about a number of warnings found by the code analyzers is added in the release metadata. Thus, when building the main branch, not just "release 7.0.2" is written in your repository manager, but "release 7.0.2, containing 100,500 checkstyle-warnings. If you are using advanced repositories manager (such as JFrog Artifactory), it&#8217;s easy to keep such metadata about your release.</p>
+</li>
+<li>
+<p>When building, each pull request compares the number of resulting warnings with their number in a current release. If a PR leads to a growth of this number, the code does not pass quality gate on static analysis. If the number of warnings is reduced or not changed — then it passes.</p>
+</li>
+<li>
+<p>During the next release, the recalculated number will be written in the metadata again.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Thus, slowly but surely, the number of warnings decrease to zero. Of course, the system can be fooled by introducing a new warning and correcting someone else&#8217;s. This is normal, because in the long run, it gives the same result: warnings get fixed, usually not one by one, but by groups of a certain type, and all easily-resolved warnings are resolved fairly quickly.</p>
+</div>
+<div class="paragraph">
+<p>This graph shows the total number of Checkstyle warnings for six months of such a ratchet on the <a href="https://github.com/CourseOrchestra/celesta">one of our open source projects</a>. The number of warnings has been considerably reduced, and it happened naturally, in parallel with the development of the product!</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/ratchet-at-work.png" alt="ratchet at work">
+</div>
+</div>
+<div class="paragraph">
+<p>I apply the modified version of this method. I count the warnings separately for different project modules and analysis tools. The YAML file with metadata about the build, which is formed in doing so, looks as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">celesta-sql:
+  checkstyle: 434
+  spotbugs: 45
+celesta-core:
+  checkstyle: 206
+  spotbugs: 13
+celesta-maven-plugin:
+  checkstyle: 19
+  spotbugs: 0
+celesta-unit:
+  checkstyle: 0
+  spotbugs: 0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In any advanced CI-system a ratchet can be implemented for any static analysis tools, without relying on plugins and third-party tools. Each of the analyzers issues its report in a simple text or XML format, which will be easily analyzed. The only thing to do after, is to write the needed logic in a CI-script. You can peek and see <a href="https://github.com/CourseOrchestra/2bass/blob/dev/Jenkinsfilephere" class="bare">https://github.com/CourseOrchestra/2bass/blob/dev/Jenkinsfilephere</a>] or <a href="https://github.com/CourseOrchestra/celesta/blob/dev/Jenkinsfile">here</a> how it is implemented in our source projects based on Jenkins and Artifactory. Both examples depend on the library <a href="https://github.com/inponomarev/ratchetlib">ratchetlib</a>: method <code>countWarnings()</code> in the usual way counts XML tags in files generated by Checkstyle and Spotbugs, and   <code>compareWarningMaps()</code> implements that very ratchet, throwing an error in case, if the number of warnings in any of the categories is increasing.</p>
+</div>
+<div class="paragraph">
+<p>An interesting way of ratchet implementation is possible for analyzing spelling of comments, text literals and documentation using aspell. As you may know, when checking the spelling, not all words unknown to the standard dictionary are incorrect, and they can be added to the custom dictionary. If you make a custom dictionary a part of the source code project, then the quality gate for spelling can be formulated as follows: running aspell with standard and custom dictionary <a href="https://github.com/CourseOrchestra/celesta/blob/271dcfc8dc3ad65ac2d1dcaa39b7fd3ea8fb5891/Jenkinsfile#L36">should not</a> find any spelling mistakes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_importance_of_fixing_the_analyzer_version"><a class="anchor" href="#_the_importance_of_fixing_the_analyzer_version"></a>The Importance of Fixing the Analyzer Version</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In conclusion, it is necessary to note the following: whichever way you choose to introduce the analysis in your delivery pipeline, the analyzer version must be fixed. If you let the analyzer update itself spontaneously, then when building another pull request, new defects may emerge, which don&#8217;t relate to changed code, but to the fact that the new analyzer is simply able to detect more defects. This will break your process of pull request verification. The analyzer upgrade must be a conscious action. Anyway, rigid version fixation of each build component is a general requirement and a subject for a another topic.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusions"><a class="anchor" href="#_conclusions"></a>Conclusions</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Static analysis will not find bugs and will not improve the quality of your product as a result of a single run. Only its continuous running in the process of delivery will produce a positive effect.</p>
+</li>
+<li>
+<p>Bug hunting is not the main analysis objective at all. The vast majority of useful features is available in open source tools.</p>
+</li>
+<li>
+<p>Introduce quality gates by the results of static analysis on the first stage of the delivery pipeline, using the ratchet for legacy code.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<script id="site-script" src="../_/js/site.js" data-ui-root-path="../_"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
